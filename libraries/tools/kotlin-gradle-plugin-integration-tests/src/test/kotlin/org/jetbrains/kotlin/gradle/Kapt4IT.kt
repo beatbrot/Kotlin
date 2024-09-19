@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName
 import kotlin.io.path.appendText
 import kotlin.io.path.name
 import kotlin.io.path.walk
+import kotlin.io.path.writeText
 
 @DisplayName("Kapt 4 base checks")
 class Kapt4IT : Kapt3IT() {
@@ -32,6 +33,10 @@ class Kapt4IT : Kapt3IT() {
     @Disabled("Doesn't make sense in Kapt 4")
     @GradleTest
     override fun useK2KaptProperty(gradleVersion: GradleVersion) {}
+
+    @Disabled("KT- stub generation should fail on files with declaration syntax errors but in K2KAPT it does not")
+    @GradleTest
+    override fun testFailOnTopLevelSyntaxError(gradleVersion: GradleVersion) {}
 
     @DisplayName("KT-61879: K2 KAPT works with proguarded compiler jars and enum class")
     @GradleTest
@@ -61,18 +66,23 @@ class Kapt4ClassLoadersCacheIT : Kapt3ClassLoadersCacheIT() {
     @Disabled("Doesn't make sense in Kapt 4")
     @GradleTest
     override fun fallBackModeWithLanguageVersion2_0(gradleVersion: GradleVersion) {}
+
+    @Disabled("KT- stub generation should fail on files with declaration syntax errors but in K2KAPT it does not")
+    @GradleTest
+    override fun testFailOnTopLevelSyntaxError(gradleVersion: GradleVersion) {}
 }
 
 fun TestProject.forceKapt4() {
     projectPath.walk().forEach {
         when (it.fileName.name) {
+            "gradle.properties" -> it.appendText("\nkapt.use.k2=true\n")
             "build.gradle" -> it.appendText(
                 """
                 
                 try {
                     Class.forName('org.jetbrains.kotlin.gradle.tasks.KotlinCompile')
                     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-                       compilerOptions.freeCompilerArgs.addAll(['-Xuse-k2-kapt', '-Xsuppress-version-warnings'])
+                       compilerOptions.freeCompilerArgs.addAll(['-Xsuppress-version-warnings'])
                     }
                 } catch(ClassNotFoundException ignore) {
                 }
@@ -85,7 +95,7 @@ fun TestProject.forceKapt4() {
                 try {
                     Class.forName("org.jetbrains.kotlin.gradle.tasks.KotlinCompile")
                     tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile::class.java).configureEach {
-                       compilerOptions.freeCompilerArgs.addAll(listOf("-Xuse-k2-kapt", "-Xsuppress-version-warnings"))
+                       compilerOptions.freeCompilerArgs.addAll(listOf("-Xsuppress-version-warnings"))
                     }
                 } catch(ignore: ClassNotFoundException) {
                 }

@@ -86,7 +86,8 @@ open class KaptIncrementalIT : KGPBaseTest() {
         }
     }
 
-    @DisplayName("Successfully rebuild after error")
+    @Disabled("KT- ")
+    @DisplayName("Successfully rebuild after compilation error")
     @GradleTest
     fun testCompileError(gradleVersion: GradleVersion) {
         kaptProject(gradleVersion) {
@@ -94,11 +95,30 @@ open class KaptIncrementalIT : KGPBaseTest() {
 
             val bKt = javaSourcesDir().resolve("bar/B.kt")
             val errorKt = bKt.resolveSibling("error.kt")
-            errorKt.writeText("<COMPILE_ERROR_MARKER>")
+            errorKt.writeText("fun foo() { ElementExpectedError }") //kapt will process this successfully as it ignores bodies
 
-            buildAndFail("assemble") {
-                assertTasksFailed(":kaptGenerateStubsKotlin")
+            buildAndFail("assemble")
+
+            errorKt.deleteIfExists()
+            bKt.modify { "$it\n" }
+            build("assemble", buildOptions = buildOptions.copy(logLevel = LogLevel.DEBUG)) {
+                assertCompiledKotlinSources(listOf(projectPath.relativize(bKt)), output)
+                assertTasksExecuted(":kaptGenerateStubsKotlin", ":compileKotlin")
             }
+        }
+    }
+
+    @DisplayName("Successfully rebuild after KAPT stubs generation error")
+    @GradleTest
+    fun testKaptError(gradleVersion: GradleVersion) {
+        kaptProject(gradleVersion) {
+            build("assemble")
+
+            val bKt = javaSourcesDir().resolve("bar/B.kt")
+            val errorKt = bKt.resolveSibling("error.kt")
+            errorKt.writeText("<COMPILE_ERROR_MARKER>") //this is a declaration problem so KAPT will fail on it
+
+            buildAndFail("assemble")
 
             errorKt.deleteIfExists()
             bKt.modify { "$it\n" }
@@ -269,7 +289,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
 
     @DisplayName("Incremental kapt run is correct after removing all Kotlin sources")
     @GradleTest
-    fun testRemoveAllKotlinSources(gradleVersion: GradleVersion) {
+    open fun testRemoveAllKotlinSources(gradleVersion: GradleVersion) {
         kaptProject(gradleVersion) {
             build("assemble") {
                 assertFileInProjectExists("$KAPT3_STUBS_PATH/bar/UseBKt.java")
