@@ -1,12 +1,12 @@
 // TARGET_BACKEND: NATIVE
 // FILECHECK_STAGE: CStubs
-// ASSERTIONS_MODE: always-disable
+// ASSERTIONS_MODE: legacy
 // WITH_STDLIB
 
 @OptIn(kotlin.experimental.ExperimentalNativeApi::class)
 
 // CHECK-LABEL: define i32 @"kfun:#nonEmptySize(kotlin.IntArray){}kotlin.Int"
-// CHECK-NOT: call void @"kfun:kotlin.AssertionError#<init>(kotlin.Any?){}"
+// CHECK: call void @"kfun:kotlin.AssertionError#<init>(kotlin.Any?){}"
 fun nonEmptySize(x: IntArray): Int {
     assert(x.size != 0) { "x.size = ${x.size}" }
     return x.size

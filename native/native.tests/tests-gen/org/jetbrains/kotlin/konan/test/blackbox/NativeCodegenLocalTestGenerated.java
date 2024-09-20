@@ -863,6 +863,66 @@ public class NativeCodegenLocalTestGenerated extends AbstractNativeCodegenBoxTes
     }
 
     @Test
+    @TestMetadata("assertDisabledInConditionAndMessage.kt")
+    public void testAssertDisabledInConditionAndMessage() {
+      runTest("native/native.tests/testData/codegen/fileCheck/assertDisabledInConditionAndMessage.kt");
+    }
+
+    @Test
+    @TestMetadata("assertDisabledInlined.kt")
+    public void testAssertDisabledInlined() {
+      runTest("native/native.tests/testData/codegen/fileCheck/assertDisabledInlined.kt");
+    }
+
+    @Test
+    @TestMetadata("assertDisabledInlinedCrossModule.kt")
+    public void testAssertDisabledInlinedCrossModule() {
+      runTest("native/native.tests/testData/codegen/fileCheck/assertDisabledInlinedCrossModule.kt");
+    }
+
+    @Test
+    @TestMetadata("assertEnabledInConditionAndMessage.kt")
+    public void testAssertEnabledInConditionAndMessage() {
+      runTest("native/native.tests/testData/codegen/fileCheck/assertEnabledInConditionAndMessage.kt");
+    }
+
+    @Test
+    @TestMetadata("assertEnabledInlined.kt")
+    public void testAssertEnabledInlined() {
+      runTest("native/native.tests/testData/codegen/fileCheck/assertEnabledInlined.kt");
+    }
+
+    @Test
+    @TestMetadata("assertEnabledInlinedCrossModule.kt")
+    public void testAssertEnabledInlinedCrossModule() {
+      runTest("native/native.tests/testData/codegen/fileCheck/assertEnabledInlinedCrossModule.kt");
+    }
+
+    @Test
+    @TestMetadata("assertJvm.kt")
+    public void testAssertJvm() {
+      runTest("native/native.tests/testData/codegen/fileCheck/assertJvm.kt");
+    }
+
+    @Test
+    @TestMetadata("assertJvmInlined.kt")
+    public void testAssertJvmInlined() {
+      runTest("native/native.tests/testData/codegen/fileCheck/assertJvmInlined.kt");
+    }
+
+    @Test
+    @TestMetadata("assertLegacy.kt")
+    public void testAssertLegacy() {
+      runTest("native/native.tests/testData/codegen/fileCheck/assertLegacy.kt");
+    }
+
+    @Test
+    @TestMetadata("assertLegacyInlined.kt")
+    public void testAssertLegacyInlined() {
+      runTest("native/native.tests/testData/codegen/fileCheck/assertLegacyInlined.kt");
+    }
+
+    @Test
     @TestMetadata("atomics.kt")
     public void testAtomics() {
       runTest("native/native.tests/testData/codegen/fileCheck/atomics.kt");

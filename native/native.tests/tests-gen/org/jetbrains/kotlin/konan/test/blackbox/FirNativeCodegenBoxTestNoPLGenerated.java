@@ -1171,6 +1171,30 @@ public class FirNativeCodegenBoxTestNoPLGenerated extends AbstractNativeCodegenB
         runTest("compiler/testData/codegen/box/assert/alwaysEnable.kt");
       }
 
+      @Test
+      @TestMetadata("assertDisabledAsActualFunction.kt")
+      public void testAssertDisabledAsActualFunction() {
+        runTest("compiler/testData/codegen/box/assert/assertDisabledAsActualFunction.kt");
+      }
+
+      @Test
+      @TestMetadata("assertDisabledAsActualFunctionHmpp.kt")
+      public void testAssertDisabledAsActualFunctionHmpp() {
+        runTest("compiler/testData/codegen/box/assert/assertDisabledAsActualFunctionHmpp.kt");
+      }
+
+      @Test
+      @TestMetadata("assertEnabledAsActualFunction.kt")
+      public void testAssertEnabledAsActualFunction() {
+        runTest("compiler/testData/codegen/box/assert/assertEnabledAsActualFunction.kt");
+      }
+
+      @Test
+      @TestMetadata("assertEnabledAsActualFunctionHmpp.kt")
+      public void testAssertEnabledAsActualFunctionHmpp() {
+        runTest("compiler/testData/codegen/box/assert/assertEnabledAsActualFunctionHmpp.kt");
+      }
+
       @Nested
       @TestMetadata("compiler/testData/codegen/box/assert/jvm")
       @TestDataPath("$PROJECT_ROOT")
