@@ -854,7 +854,6 @@ class FirElementSerializer private constructor(
 
         if (parameter.isVararg) {
             val varargElementType = parameter.returnTypeRef.coneType.varargElementType()
-                .withAttributes(parameter.returnTypeRef.annotations.computeTypeAttributes(session, shouldExpandTypeAliases = false))
             if (useTypeTable()) {
                 builder.varargElementTypeId = typeId(varargElementType)
             } else {
