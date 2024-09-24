@@ -125,7 +125,7 @@ internal class GranularMetadataTransformation(
             objects = project.objects,
             kotlinKmpProjectIsolationEnabled = project.kotlinPropertiesProvider.kotlinKmpProjectIsolationEnabled,
             sourceSetsMetadataSharedDataProvider = project.kotlinSecondaryVariantsDataSharing.consume(
-                KOTLIN_PROJECT_SHARED_USAGE,
+                SOURCE_SETS_DATA_SHARING_KEY,
                 kotlinSourceSet.internal.resolvableMetadataConfiguration,
                 SourceSetToClassDirMap::class.java
             )
