@@ -431,15 +431,21 @@ abstract class AbstractDiagnosticCollectorVisitor(
     ): R {
         val (implicitReceiverValue, implicitCompanionValues) = context.sessionHolder.collectImplicitReceivers(type, owner)
         val existingContext = context
+        var implicitReceiversCount = 0
         implicitCompanionValues.forEach { value ->
             context = context.addImplicitReceiver(null, value)
+            implicitReceiversCount++
         }
         implicitReceiverValue?.let {
             context = context.addImplicitReceiver(labelName, it)
+            implicitReceiversCount++
         }
         try {
             return block()
         } finally {
+            repeat(implicitReceiversCount) {
+                context.dropImplicitReceiver()
+            }
             context = existingContext
         }
     }

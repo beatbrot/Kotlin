@@ -55,6 +55,8 @@ abstract class CheckerContextForProvider(
 
     abstract fun dropDeclaration()
 
+    abstract fun dropImplicitReceiver()
+
     fun <T> withDeclaration(declaration: FirDeclaration, f: (CheckerContextForProvider) -> T): T {
         val newContext = addDeclaration(declaration)
         try {
