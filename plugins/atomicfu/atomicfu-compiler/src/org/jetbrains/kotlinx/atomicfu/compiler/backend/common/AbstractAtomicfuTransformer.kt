@@ -139,6 +139,13 @@ abstract class AbstractAtomicfuTransformer(
             }
         }
 
+        /**
+         * This function creates an [AtomicHandler] for a given atomicfu property.
+         * [AtomicHandler] is only created for:
+         * - Atomics: properties of type kotlinx.atomicfu.Atomic(Int|Long|Ref|Boolean)
+         * - AtomicArrays: properties of type kotlinx.atomicfu.Atomic(Int|Long|*)Array
+         * Otherwise, this function returns null.
+         */
         abstract fun createAtomicHandler(atomicfuProperty: IrProperty, parentContainer: IrDeclarationContainer): AtomicHandler<IrProperty>?
 
         /**
