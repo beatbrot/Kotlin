@@ -394,6 +394,37 @@ abstract class AbstractAtomicfuIrBuilder(
     private fun IrValueParameter.getAtomicHandler(atomicHandlerType: AtomicHandlerType) =
         if (atomicHandlerType == AtomicHandlerType.NATIVE_PROPERTY_REF) invokePropertyGetter(irGet(this)) else irGet(this)
 
+    /**
+     * K/N for a property reference atomic handler:
+     * inline fun loop$atomicfu(refGetter: () -> KMutableProperty0<Int>, action: (Int) -> Unit) {
+     *     while (true) {
+     *         val cur = refGetter().get()
+               action(cur)
+     *     }
+     * }
+     *
+     * JVM:
+     * inline fun loop$atomicfu(atomicFieldUpdater: AtomicIntegerFieldUpdater, obj: Any, action: (Int) -> Unit) {
+     *     while (true) {
+     *         val cur = atomicFieldUpdater.get(obj)
+     *         action(cur)
+     *     }
+     * }
+     *
+     * inline fun loop$atomicfu(boxedAtomic: AtomicInteger, action: (Int) -> Unit) {
+     *     while (true) {
+     *         val cur = boxedAtomic.get()
+     *         action(cur)
+     *     }
+     * }
+     *
+     * inline fun loop$atomicfu(atomicArray: AtomicIntegerArray, index: Int, action: (Int) -> Unit) {
+     *     while (true) {
+     *         val cur = atomicArray.get(index)
+     *         action(cur)
+     *     }
+     * }
+     */
     fun generateLoopBody(atomicHandlerType: AtomicHandlerType, valueType: IrType, valueParameters: List<IrValueParameter>) =
         irBlockBody {
             val atomicHandlerParam = valueParameters[0] // ATOMIC_HANDLER
@@ -422,6 +453,41 @@ abstract class AbstractAtomicfuIrBuilder(
             }
         }
 
+    /**
+     * K/N:
+     * inline fun getAndUpdate$atomicfu(refGetter: () -> KMutableProperty0<Int>, action: (Int) -> Int): Int {
+     *     while (true) {
+     *         val cur = refGetter().get()
+     *.        val upd = action(cur)
+     *         if (refGetter().compareAndSetField(cur, upd)) return cur
+     *     }
+     * }
+     *
+     * JVM:
+     * inline fun getAndUpdate$atomicfu(atomicFieldUpdater: AtomicIntegerFieldUpdater, obj: Any, action: (Int) -> Int): Int {
+     *     while (true) {
+     *         val cur = atomicFieldUpdater.get(obj)
+     *         val upd = action(cur)
+     *         if (atomicFieldUpdater.compareAndSet(cur, upd)) return cur
+     *     }
+     * }
+     *
+     * inline fun getAndUpdate$atomicfu(boxedAtomic: AtomicInteger, action: (Int) -> Int): Int {
+     *     while (true) {
+     *         val cur = boxedAtomic.get()
+     *         val upd = action(cur)
+     *         if (boxedAtomic.compareAndSet(cur, upd)) return cur
+     *     }
+     * }
+     *
+     * inline fun getAndUpdate$atomicfu(atomicArray: AtomicIntegerArray, index: Int, action: (Int) -> Int): Int {
+     *     while (true) {
+     *         val cur = atomicArray.get(index)
+     *         val upd = action(cur)
+     *         if (atomicArray.compareAndSet(index, cur, upd)) return cur
+     *     }
+     * }
+     */
     fun generateUpdateBody(atomicHandlerType: AtomicHandlerType, valueType: IrType, valueParameters: List<IrValueParameter>, functionName: String) =
         irBlockBody {
             val atomicHandlerParam = valueParameters[0] // ATOMIC_HANDLER
