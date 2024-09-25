@@ -104,7 +104,7 @@ class JvmAtomicfuIrBuilder(
                 origin = AbstractAtomicSymbols.ATOMICFU_GENERATED_FIELD
             }.apply {
                 this.initializer = context.irFactory.createExpressionBody(
-                    newAtomicInteger(atomicBoxType, initValue, (atomicFactoryCall as IrFunctionAccessExpression).dispatchReceiver)
+                    newJavaBoxedAtomic(atomicBoxType, initValue, (atomicFactoryCall as IrFunctionAccessExpression).dispatchReceiver)
                 )
                 this.annotations = annotations
                 this.parent = parentContainer
