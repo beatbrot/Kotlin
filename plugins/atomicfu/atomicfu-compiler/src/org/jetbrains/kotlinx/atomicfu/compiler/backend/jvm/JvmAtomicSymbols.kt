@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.*
 import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
 import org.jetbrains.kotlin.ir.expressions.IrCall
@@ -27,6 +28,7 @@ import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlinx.atomicfu.compiler.backend.AtomicHandlerType
 import org.jetbrains.kotlinx.atomicfu.compiler.backend.common.AbstractAtomicSymbols
 
 class JvmAtomicSymbols(
@@ -43,409 +45,59 @@ class JvmAtomicSymbols(
         get() = context.referenceClass(ClassId(FqName("kotlin.jvm"), Name.identifier("Volatile")))?.owner
             ?: error("kotlin.jvm.Volatile class is not found")
 
-    // java.util.concurrent.AtomicIntegerFieldUpdater
+    // java.util.concurrent.atomic.AtomicIntegerFieldUpdater
     val javaAtomicIntegerFieldUpdaterClass: IrClassSymbol by lazy {
-        createClass(javaUtilConcurrent, "AtomicIntegerFieldUpdater", ClassKind.CLASS, Modality.FINAL).apply {
-            owner.addFunction("newUpdater", this.defaultType, isStatic = true).apply {
-                addValueParameter("tclass", javaLangClass.starProjectedType)
-                addValueParameter("fieldName", irBuiltIns.stringType)
-            }
-            owner.addFunction(name = "get", returnType = irBuiltIns.intType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-            }
-            owner.addFunction(name = "set", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("newValue", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "compareAndSet", returnType = irBuiltIns.booleanType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("expect", irBuiltIns.intType)
-                addValueParameter("update", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "addAndGet", returnType = irBuiltIns.intType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("delta", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "getAndAdd", returnType = irBuiltIns.intType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("delta", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "incrementAndGet", returnType = irBuiltIns.intType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-            }
-            owner.addFunction(name = "getAndIncrement", returnType = irBuiltIns.intType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-            }
-            owner.addFunction(name = "decrementAndGet", returnType = irBuiltIns.intType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-            }
-            owner.addFunction(name = "getAndDecrement", returnType = irBuiltIns.intType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-            }
-            owner.addFunction(name = "lazySet", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("newValue", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "getAndSet", returnType = irBuiltIns.intType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("newValue", irBuiltIns.intType)
-            }
-        }
+        createJavaAtomicClass("AtomicIntegerFieldUpdater", irBuiltIns.intType, AtomicHandlerType.ATOMIC_FIELD_UPDATER)
     }
 
-    // java.util.concurrent.AtomicLongFieldUpdater
+    // java.util.concurrent.atomic.AtomicLongFieldUpdater
     val javaAtomicLongFieldUpdaterClass: IrClassSymbol by lazy {
-        createClass(javaUtilConcurrent, "AtomicLongFieldUpdater", ClassKind.CLASS, Modality.FINAL).apply {
-            owner.addFunction("newUpdater", this.defaultType, isStatic = true).apply {
-                addValueParameter("tclass", javaLangClass.starProjectedType)
-                addValueParameter("fieldName", irBuiltIns.stringType)
-            }
-            owner.addFunction(name = "get", returnType = irBuiltIns.longType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-            }
-            owner.addFunction(name = "set", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("newValue", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "compareAndSet", returnType = irBuiltIns.booleanType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("expect", irBuiltIns.longType)
-                addValueParameter("update", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "addAndGet", returnType = irBuiltIns.longType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("delta", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "getAndAdd", returnType = irBuiltIns.longType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("delta", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "incrementAndGet", returnType = irBuiltIns.longType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-            }
-            owner.addFunction(name = "getAndIncrement", returnType = irBuiltIns.longType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-            }
-            owner.addFunction(name = "decrementAndGet", returnType = irBuiltIns.longType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-            }
-            owner.addFunction(name = "getAndDecrement", returnType = irBuiltIns.longType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-            }
-            owner.addFunction(name = "lazySet", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("newValue", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "getAndSet", returnType = irBuiltIns.longType).apply {
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("newValue", irBuiltIns.longType)
-            }
-        }
+        createJavaAtomicClass("AtomicLongFieldUpdater", irBuiltIns.longType, AtomicHandlerType.ATOMIC_FIELD_UPDATER)
     }
 
-    // java.util.concurrent.AtomicReferenceFieldUpdater
+    // java.util.concurrent.atomic.AtomicReferenceFieldUpdater
     val javaAtomicRefFieldUpdaterClass: IrClassSymbol by lazy {
-        createClass(javaUtilConcurrent, "AtomicReferenceFieldUpdater", ClassKind.CLASS, Modality.FINAL).apply {
-            owner.addFunction("newUpdater", this.defaultType, isStatic = true).apply {
-                addValueParameter("tclass", javaLangClass.starProjectedType)
-                addValueParameter("vclass", javaLangClass.starProjectedType)
-                addValueParameter("fieldName", irBuiltIns.stringType)
-            }
-            owner.addFunction(name = "get", returnType = irBuiltIns.anyNType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("obj", irBuiltIns.anyType)
-                returnType = valueType.defaultType
-            }
-            owner.addFunction(name = "set", returnType = irBuiltIns.unitType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("newValue", valueType.defaultType)
-            }
-            owner.addFunction(name = "compareAndSet", returnType = irBuiltIns.booleanType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("expect", valueType.defaultType)
-                addValueParameter("update", valueType.defaultType)
-            }
-            owner.addFunction(name = "lazySet", returnType = irBuiltIns.unitType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("newValue", valueType.defaultType)
-            }
-            owner.addFunction(name = "getAndSet", returnType = irBuiltIns.anyNType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("obj", irBuiltIns.anyType)
-                addValueParameter("newValue", valueType.defaultType)
-                returnType = valueType.defaultType
-            }
-        }
+        createJavaAtomicClass("AtomicReferenceFieldUpdater", irBuiltIns.anyType, AtomicHandlerType.ATOMIC_FIELD_UPDATER)
+    }
+
+    // java.util.concurrent.atomic.AtomicIntegerArray
+    override val atomicIntArrayClassSymbol: IrClassSymbol by lazy {
+        createJavaAtomicClass("AtomicIntegerArray", irBuiltIns.intType, AtomicHandlerType.ATOMIC_ARRAY)
+    }
+
+    // java.util.concurrent.atomic.AtomicLongArray
+    override val atomicLongArrayClassSymbol: IrClassSymbol by lazy {
+        createJavaAtomicClass("AtomicLongArray", irBuiltIns.longType, AtomicHandlerType.ATOMIC_ARRAY)
+    }
+
+    // java.util.concurrent.atomic.AtomicReferenceArray
+    override val atomicRefArrayClassSymbol: IrClassSymbol by lazy {
+        createJavaAtomicClass("AtomicReferenceArray", irBuiltIns.anyType, AtomicHandlerType.ATOMIC_ARRAY)
+    }
+
+    // java.util.concurrent.atomic.AtomicInteger
+    val javaAtomicIntegerClass: IrClassSymbol by lazy {
+        createJavaAtomicClass("AtomicInteger", irBuiltIns.intType, AtomicHandlerType.BOXED_ATOMIC)
+    }
+
+    // java.util.concurrent.atomic.AtomicLong
+    val javaAtomicLongClass: IrClassSymbol by lazy {
+        createJavaAtomicClass("AtomicLong", irBuiltIns.longType, AtomicHandlerType.BOXED_ATOMIC)
+    }
+
+    // java.util.concurrent.atomic.AtomicReference
+    val javaAtomicReferenceClass: IrClassSymbol by lazy {
+        createJavaAtomicClass("AtomicReference", irBuiltIns.anyType, AtomicHandlerType.BOXED_ATOMIC)
+    }
+
+    // java.util.concurrent.atomic.AtomicBoolean
+    val javaAtomicBooleanClass: IrClassSymbol by lazy {
+        createJavaAtomicClass("AtomicBoolean", irBuiltIns.booleanType, AtomicHandlerType.BOXED_ATOMIC)
     }
 
     fun newUpdater(atomicUpdaterClassSymbol: IrClassSymbol): IrSimpleFunctionSymbol =
         atomicUpdaterClassSymbol.getSimpleFunction("newUpdater")
             ?: error("No newUpdater function was found for ${atomicUpdaterClassSymbol.owner.render()} ")
-
-    // java.util.concurrent.AtomicIntegerArray
-    override val atomicIntArrayClassSymbol: IrClassSymbol by lazy {
-        createClass(javaUtilConcurrent, "AtomicIntegerArray", ClassKind.CLASS, Modality.FINAL).apply {
-            owner.addConstructor().apply {
-                addValueParameter("length", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "get", returnType = irBuiltIns.intType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "set", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("newValue", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "compareAndSet", returnType = irBuiltIns.booleanType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("expect", irBuiltIns.intType)
-                addValueParameter("update", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "addAndGet", returnType = irBuiltIns.intType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("delta", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "getAndAdd", returnType = irBuiltIns.intType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("delta", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "incrementAndGet", returnType = irBuiltIns.intType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "getAndIncrement", returnType = irBuiltIns.intType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "decrementAndGet", returnType = irBuiltIns.intType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "getAndDecrement", returnType = irBuiltIns.intType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "lazySet", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("newValue", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "getAndSet", returnType = irBuiltIns.intType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("newValue", irBuiltIns.intType)
-            }
-        }
-    }
-
-    // java.util.concurrent.AtomicLongArray
-    override val atomicLongArrayClassSymbol: IrClassSymbol by lazy {
-        createClass(javaUtilConcurrent, "AtomicLongArray", ClassKind.CLASS, Modality.FINAL).apply {
-            owner.addConstructor().apply {
-                addValueParameter("length", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "get", returnType = irBuiltIns.longType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "set", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("newValue", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "compareAndSet", returnType = irBuiltIns.booleanType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("expect", irBuiltIns.longType)
-                addValueParameter("update", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "addAndGet", returnType = irBuiltIns.longType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("delta", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "getAndAdd", returnType = irBuiltIns.longType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("delta", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "incrementAndGet", returnType = irBuiltIns.longType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "getAndIncrement", returnType = irBuiltIns.longType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "decrementAndGet", returnType = irBuiltIns.longType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "getAndDecrement", returnType = irBuiltIns.longType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "lazySet", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("newValue", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "getAndSet", returnType = irBuiltIns.longType).apply {
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("newValue", irBuiltIns.longType)
-            }
-        }
-    }
-
-    // java.util.concurrent.AtomicReferenceArray
-    override val atomicRefArrayClassSymbol: IrClassSymbol by lazy {
-        createClass(javaUtilConcurrent, "AtomicReferenceArray", ClassKind.CLASS, Modality.FINAL).apply {
-            owner.addConstructor().apply {
-                addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("length", irBuiltIns.intType)
-            }
-            owner.addConstructor().apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("array", irBuiltIns.arrayClass.defaultType)
-            }
-            owner.addFunction(name = "get", returnType = irBuiltIns.anyNType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("i", irBuiltIns.intType)
-                returnType = valueType.defaultType
-            }
-            owner.addFunction(name = "set", returnType = irBuiltIns.unitType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("newValue", valueType.defaultType)
-            }
-            owner.addFunction(name = "compareAndSet", returnType = irBuiltIns.booleanType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("expect", valueType.defaultType)
-                addValueParameter("update", valueType.defaultType)
-            }
-            owner.addFunction(name = "lazySet", returnType = irBuiltIns.unitType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("newValue", valueType.defaultType)
-            }
-            owner.addFunction(name = "getAndSet", returnType = irBuiltIns.anyNType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("i", irBuiltIns.intType)
-                addValueParameter("newValue", valueType.defaultType)
-                returnType = valueType.defaultType
-            }
-        }
-    }
-
-    // java.util.concurrent.AtomicInteger
-
-    val javaAtomicIntegerClass: IrClassSymbol by lazy {
-        createClass(javaUtilConcurrent, "AtomicInteger", ClassKind.CLASS, Modality.FINAL).apply {
-            owner.addConstructor().apply {
-                addValueParameter("value", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "get", returnType = irBuiltIns.intType)
-            owner.addFunction(name = "set", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("newValue", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "compareAndSet", returnType = irBuiltIns.booleanType).apply {
-                addValueParameter("expect", irBuiltIns.intType)
-                addValueParameter("update", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "addAndGet", returnType = irBuiltIns.intType).apply {
-                addValueParameter("delta", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "getAndAdd", returnType = irBuiltIns.intType).apply {
-                addValueParameter("delta", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "incrementAndGet", returnType = irBuiltIns.intType)
-            owner.addFunction(name = "getAndIncrement", returnType = irBuiltIns.intType)
-            owner.addFunction(name = "decrementAndGet", returnType = irBuiltIns.intType)
-            owner.addFunction(name = "getAndDecrement", returnType = irBuiltIns.intType)
-            owner.addFunction(name = "lazySet", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("newValue", irBuiltIns.intType)
-            }
-            owner.addFunction(name = "getAndSet", returnType = irBuiltIns.intType).apply {
-                addValueParameter("newValue", irBuiltIns.intType)
-            }
-        }
-    }
-
-    // java.util.concurrent.AtomicLong
-
-    val javaAtomicLongClass: IrClassSymbol by lazy {
-        createClass(javaUtilConcurrent, "AtomicLong", ClassKind.CLASS, Modality.FINAL).apply {
-            owner.addConstructor().apply {
-                addValueParameter("value", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "get", returnType = irBuiltIns.longType)
-            owner.addFunction(name = "set", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("newValue", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "compareAndSet", returnType = irBuiltIns.booleanType).apply {
-                addValueParameter("expect", irBuiltIns.longType)
-                addValueParameter("update", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "addAndGet", returnType = irBuiltIns.longType).apply {
-                addValueParameter("delta", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "getAndAdd", returnType = irBuiltIns.longType).apply {
-                addValueParameter("delta", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "incrementAndGet", returnType = irBuiltIns.longType)
-            owner.addFunction(name = "getAndIncrement", returnType = irBuiltIns.longType)
-            owner.addFunction(name = "decrementAndGet", returnType = irBuiltIns.longType)
-            owner.addFunction(name = "getAndDecrement", returnType = irBuiltIns.longType)
-            owner.addFunction(name = "lazySet", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("newValue", irBuiltIns.longType)
-            }
-            owner.addFunction(name = "getAndSet", returnType = irBuiltIns.longType).apply {
-                addValueParameter("newValue", irBuiltIns.longType)
-            }
-        }
-    }
-
-    val javaAtomicReferenceClass: IrClassSymbol by lazy {
-        createClass(javaUtilConcurrent, "AtomicReference", ClassKind.CLASS, Modality.FINAL).apply {
-            owner.addConstructor().apply {
-                addValueParameter("value", irBuiltIns.anyNType)
-            }
-            owner.addFunction(name = "get", returnType = irBuiltIns.anyNType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                returnType = valueType.defaultType
-            }
-            owner.addFunction(name = "set", returnType = irBuiltIns.unitType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("newValue", valueType.defaultType)
-            }
-            owner.addFunction(name = "compareAndSet", returnType = irBuiltIns.booleanType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("expect", valueType.defaultType)
-                addValueParameter("update", valueType.defaultType)
-            }
-            owner.addFunction(name = "lazySet", returnType = irBuiltIns.unitType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("newValue", valueType.defaultType)
-            }
-            owner.addFunction(name = "getAndSet", returnType = irBuiltIns.anyNType).apply {
-                val valueType = addTypeParameter("T", irBuiltIns.anyNType)
-                addValueParameter("newValue", valueType.defaultType)
-                returnType = valueType.defaultType
-            }
-        }
-    }
-
-    val javaAtomicBooleanClass: IrClassSymbol by lazy {
-        createClass(javaUtilConcurrent, "AtomicBoolean", ClassKind.CLASS, Modality.FINAL).apply {
-            owner.addConstructor().apply {
-                addValueParameter("value", irBuiltIns.booleanType)
-            }
-            owner.addFunction(name = "get", returnType = irBuiltIns.booleanType).apply {
-                returnType = irBuiltIns.booleanType
-            }
-            owner.addFunction(name = "set", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("newValue", irBuiltIns.booleanType)
-            }
-            owner.addFunction(name = "compareAndSet", returnType = irBuiltIns.booleanType).apply {
-                addValueParameter("expect", irBuiltIns.booleanType)
-                addValueParameter("update", irBuiltIns.booleanType)
-            }
-            owner.addFunction(name = "lazySet", returnType = irBuiltIns.unitType).apply {
-                addValueParameter("newValue", irBuiltIns.booleanType)
-            }
-            owner.addFunction(name = "getAndSet", returnType = irBuiltIns.booleanType).apply {
-                addValueParameter("newValue", irBuiltIns.booleanType)
-                returnType = irBuiltIns.booleanType
-            }
-        }
-    }
 
     private val BOXED_ATOMIC_TYPES = setOf(
         javaAtomicIntegerClass,
@@ -480,6 +132,118 @@ class JvmAtomicSymbols(
             !valueType.isPrimitiveType() -> javaAtomicReferenceClass
             else -> error("Non of the boxed Java atomic types Atomic(Integer|Long|Boolean|Reference) can be used to atomically update a property of the given type: ${valueType.render()}")
         }
+
+    private fun createJavaAtomicClass(
+        shortClassName: String,
+        valueType: IrType,
+        atomicHandlerType: AtomicHandlerType
+    ): IrClassSymbol {
+        fun IrFunction.addReferenceTypeParameter(valueType: IrType): IrType =
+            if (valueType.isAny()) {
+                addTypeParameter("T", irBuiltIns.anyNType).defaultType
+            } else {
+                valueType
+            }
+
+        fun IrFunction.addIndexForArrayType() {
+            if (atomicHandlerType == AtomicHandlerType.ATOMIC_ARRAY) addValueParameter("i", irBuiltIns.intType)
+        }
+
+        fun IrFunction.addObjForFieldUpdaterClass() {
+            if (atomicHandlerType == AtomicHandlerType.ATOMIC_FIELD_UPDATER) addValueParameter("obj", irBuiltIns.anyType)
+        }
+        return createClass(javaUtilConcurrent, shortClassName, ClassKind.CLASS, Modality.FINAL).apply {
+            // Add constructor
+            when (atomicHandlerType) {
+                AtomicHandlerType.ATOMIC_FIELD_UPDATER -> {
+                    owner.addFunction("newUpdater", this.defaultType, isStatic = true).apply {
+                        addValueParameter("tclass", javaLangClass.starProjectedType)
+                        if (valueType.isAny()) addValueParameter("vclass", javaLangClass.starProjectedType)
+                        addValueParameter("fieldName", irBuiltIns.stringType)
+                    }
+                }
+                AtomicHandlerType.ATOMIC_ARRAY -> {
+                    owner.addConstructor().apply {
+                        addReferenceTypeParameter(valueType)
+                        addValueParameter("length", irBuiltIns.intType)
+                    }
+                    if (valueType.isAny()) {
+                        owner.addConstructor().apply {
+                            addReferenceTypeParameter(valueType)
+                            addValueParameter("array", irBuiltIns.arrayClass.defaultType)
+                        }
+                    }
+                }
+                AtomicHandlerType.BOXED_ATOMIC -> {
+                    owner.addConstructor().apply {
+                        addValueParameter("value", valueType)
+                    }
+                }
+                else -> {}
+            }
+            // Declare functions
+            owner.addFunction(name = "get", returnType = valueType).apply {
+                addObjForFieldUpdaterClass()
+                addIndexForArrayType()
+                val T = addReferenceTypeParameter(valueType)
+                returnType = T
+            }
+            owner.addFunction(name = "set", returnType = irBuiltIns.unitType).apply {
+                addObjForFieldUpdaterClass()
+                addIndexForArrayType()
+                val T = addReferenceTypeParameter(valueType)
+                addValueParameter("newValue", T)
+            }
+            owner.addFunction(name = "compareAndSet", returnType = irBuiltIns.booleanType).apply {
+                addObjForFieldUpdaterClass()
+                addIndexForArrayType()
+                val T = addReferenceTypeParameter(valueType)
+                addValueParameter("expect", T)
+                addValueParameter("update", T)
+            }
+            owner.addFunction(name = "lazySet", returnType = irBuiltIns.unitType).apply {
+                addObjForFieldUpdaterClass()
+                addIndexForArrayType()
+                val T = addReferenceTypeParameter(valueType)
+                addValueParameter("newValue", T)
+            }
+            owner.addFunction(name = "getAndSet", returnType = valueType).apply {
+                addObjForFieldUpdaterClass()
+                addIndexForArrayType()
+                val T = addReferenceTypeParameter(valueType)
+                addValueParameter("newValue", T)
+                returnType = T
+            }
+            if (valueType.isInt() || valueType.isLong()) {
+                owner.addFunction(name = "addAndGet", returnType = valueType).apply {
+                    addObjForFieldUpdaterClass()
+                    addIndexForArrayType()
+                    addValueParameter("delta", valueType)
+                }
+                owner.addFunction(name = "getAndAdd", returnType = valueType).apply {
+                    addObjForFieldUpdaterClass()
+                    addIndexForArrayType()
+                    addValueParameter("delta", valueType)
+                }
+                owner.addFunction(name = "incrementAndGet", returnType = valueType).apply {
+                    addObjForFieldUpdaterClass()
+                    addIndexForArrayType()
+                }
+                owner.addFunction(name = "getAndIncrement", returnType = valueType).apply {
+                    addObjForFieldUpdaterClass()
+                    addIndexForArrayType()
+                }
+                owner.addFunction(name = "decrementAndGet", returnType = valueType).apply {
+                    addObjForFieldUpdaterClass()
+                    addIndexForArrayType()
+                }
+                owner.addFunction(name = "getAndDecrement", returnType = valueType).apply {
+                    addObjForFieldUpdaterClass()
+                    addIndexForArrayType()
+                }
+            }
+        }
+    }
 
     private fun createClass(
         irPackage: IrPackageFragment,
