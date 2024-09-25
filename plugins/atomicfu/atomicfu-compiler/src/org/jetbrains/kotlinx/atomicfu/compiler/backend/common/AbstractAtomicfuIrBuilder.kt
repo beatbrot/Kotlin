@@ -391,10 +391,13 @@ abstract class AbstractAtomicfuIrBuilder(
         }
     }
 
+    private fun IrValueParameter.getAtomicHandler(atomicHandlerType: AtomicHandlerType) =
+        if (atomicHandlerType == AtomicHandlerType.NATIVE_PROPERTY_REF) invokePropertyGetter(irGet(this)) else irGet(this)
+
     fun generateLoopBody(atomicHandlerType: AtomicHandlerType, valueType: IrType, valueParameters: List<IrValueParameter>) =
         irBlockBody {
             val atomicHandlerParam = valueParameters[0] // ATOMIC_HANDLER
-            val getAtomicHandler = if (atomicHandlerType == AtomicHandlerType.NATIVE_PROPERTY_REF) invokePropertyGetter(irGet(atomicHandlerParam)) else irGet(atomicHandlerParam)
+            val getAtomicHandler = atomicHandlerParam.getAtomicHandler(atomicHandlerType)
             val hasExtraArg = atomicHandlerType == AtomicHandlerType.ATOMIC_ARRAY || atomicHandlerType == AtomicHandlerType.ATOMIC_FIELD_UPDATER
             val extraArg = if (hasExtraArg) valueParameters[1] else null
             val cur = createTmpVariable(
@@ -422,9 +425,7 @@ abstract class AbstractAtomicfuIrBuilder(
     fun generateUpdateBody(atomicHandlerType: AtomicHandlerType, valueType: IrType, valueParameters: List<IrValueParameter>, functionName: String) =
         irBlockBody {
             val atomicHandlerParam = valueParameters[0] // ATOMIC_HANDLER
-            val getAtomicHandler = if (atomicHandlerType == AtomicHandlerType.NATIVE_PROPERTY_REF)
-                invokePropertyGetter(irGet(atomicHandlerParam))
-            else irGet(atomicHandlerParam)
+            val getAtomicHandler = atomicHandlerParam.getAtomicHandler(atomicHandlerType)
             val hasExtraArg = atomicHandlerType == AtomicHandlerType.ATOMIC_ARRAY || atomicHandlerType == AtomicHandlerType.ATOMIC_FIELD_UPDATER
             val extraArg = if (hasExtraArg) valueParameters[1] else null
             val action = if (hasExtraArg) valueParameters[2] else valueParameters[1]
