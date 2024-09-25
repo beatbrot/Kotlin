@@ -15,7 +15,10 @@ import org.jetbrains.kotlin.ir.declarations.*
  * private val arr = kotlin.concurrent.AtomicIntArray(10) // this is an [AtomicArray] handler, which replaced the original atomicfu array.
  * arr.compareAndSet(0, 0, 100) // here an operation was invoked directly on the handler
  * ```
- * 2. An atomic handler corresponding to an argument passed to the extension function:
+ * 2. An atomic handler corresponding to an argument passed to the extension function.
+ *  These atomic handlers were added as separate classes because they hold an IrValueParameter, not an actual IrProperty,
+ *  and atomic function invocation on the atomic handler passed as a value argument is processed differently, e.g.:
+ *
  * ```
  * // original function
  * fun kotlinx.atomicfu.AtomicInt.foo(arg: Int) { compareAndSet(value, 56) }
@@ -23,6 +26,10 @@ import org.jetbrains.kotlin.ir.declarations.*
  * // transformed function for an array element receiver:
  * fun foo$atomicfu(atomicHandler: kotlin.concurrent.AtomicIntArray, index: Int, arg: Int) {
  *      atomicHandler.compareAndSet(index, value, 56) // here an operation was invoked on the atomic handler, which was passed as an argument.
+ * }
+ * // transformed function for a property reference receiver:
+ * fun foo$atomicfu(refGetter: () -> KMutableProperty<Int>, arg: Int) {
+ *     refGetter().compareAndSetField(value, 56)
  * }
  * ```
  */
