@@ -132,5 +132,5 @@ abstract class AbstractAtomicSymbols(
             else -> error("Expected kotlinx.atomicfu.(AtomicIntArray|AtomicBooleanArray|AtomicLongArray|AtomicArray) type, but found ${atomicPropertyType.render()}")
         }
 
-    abstract fun createBuilder(symbol: IrSymbol, startOffset: Int = UNDEFINED_OFFSET, endOffset: Int = UNDEFINED_OFFSET): AbstractAtomicfuIrBuilder
+    abstract fun createBuilder(symbol: IrSymbol): AbstractAtomicfuIrBuilder
 }

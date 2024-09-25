@@ -297,6 +297,6 @@ class JvmAtomicSymbols(
         dispatchReceiver = receiver
     }
 
-    override fun createBuilder(symbol: IrSymbol, startOffset: Int, endOffset: Int): JvmAtomicfuIrBuilder =
-        JvmAtomicfuIrBuilder(this, symbol, startOffset, endOffset)
+    override fun createBuilder(symbol: IrSymbol): JvmAtomicfuIrBuilder =
+        JvmAtomicfuIrBuilder(this, symbol, UNDEFINED_OFFSET, UNDEFINED_OFFSET)
 }

@@ -6,6 +6,7 @@
 package org.jetbrains.kotlinx.atomicfu.compiler.backend.native
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
@@ -79,6 +80,6 @@ class NativeAtomicSymbols(
 
     fun isVolatilePropertyReferenceGetter(type: IrType) = type.classOrNull == irBuiltIns.functionN(0).symbol
 
-    override fun createBuilder(symbol: IrSymbol, startOffset: Int, endOffset: Int) =
-        NativeAtomicfuIrBuilder(this, symbol, startOffset, endOffset)
+    override fun createBuilder(symbol: IrSymbol) =
+        NativeAtomicfuIrBuilder(this, symbol, UNDEFINED_OFFSET, UNDEFINED_OFFSET)
 }
