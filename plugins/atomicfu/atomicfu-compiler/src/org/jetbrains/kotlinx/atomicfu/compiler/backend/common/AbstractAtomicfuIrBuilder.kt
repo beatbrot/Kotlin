@@ -14,10 +14,7 @@ import org.jetbrains.kotlin.ir.builders.declarations.*
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.*
 import org.jetbrains.kotlin.ir.expressions.impl.*
-import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
-import org.jetbrains.kotlin.ir.symbols.IrFieldSymbol
-import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
-import org.jetbrains.kotlin.ir.symbols.IrSymbol
+import org.jetbrains.kotlin.ir.symbols.*
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.Name
@@ -216,12 +213,15 @@ abstract class AbstractAtomicfuIrBuilder(
         )
     }
 
+    private fun IrClassSymbol.getSingleArgCtorOrNull(predicate: (IrType) -> Boolean): IrConstructorSymbol? =
+        constructors.filter { it.owner.valueParameters.size == 1 && predicate(it.owner.valueParameters[0].type) }.singleOrNull()
+
     protected fun callArraySizeConstructor(
         atomicArrayClass: IrClassSymbol,
         size: IrExpression,
         dispatchReceiver: IrExpression?,
     ): IrFunctionAccessExpression? =
-        atomicArrayClass.constructors.filter { it.owner.valueParameters.size == 1 && it.owner.valueParameters[0].type.isInt() }.singleOrNull()?.let { cons ->
+        atomicArrayClass.getSingleArgCtorOrNull{ argType -> argType.isInt() }?.let { cons ->
             return irCall(cons).apply {
                 putValueArgument(0, size)
                 this.dispatchReceiver = dispatchReceiver
@@ -234,7 +234,7 @@ abstract class AbstractAtomicfuIrBuilder(
         valueType: IrType,
         dispatchReceiver: IrExpression?,
     ): IrFunctionAccessExpression? =
-        atomicArrayClass.constructors.filter { it.owner.valueParameters.size == 1 && it.owner.valueParameters[0].type.isArray() }.singleOrNull()?.let { cons ->
+        atomicArrayClass.getSingleArgCtorOrNull { argType -> argType.isArray() }?.let { cons ->
             return irCall(cons).apply {
                 val arrayOfNulls = irCall(atomicfuSymbols.arrayOfNulls).apply {
                     putTypeArgument(0, valueType)
