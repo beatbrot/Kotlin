@@ -164,7 +164,7 @@ abstract class AbstractAtomicfuIrBuilder(
                 val initExpr = newField.initializer?.expression
                     ?: error("The generated field [${newField.render()}] should've already be initialized.")
                 newField.initializer = null
-                initBlock.updateFieldInitialization(oldAtomicField.symbol, newField.symbol, initExpr, initExprIndex)
+                initBlock.updateFieldInitialization(newField.symbol, initExpr, initExprIndex)
             }
         } else {
             newFieldBuilder(initializer)
@@ -172,19 +172,14 @@ abstract class AbstractAtomicfuIrBuilder(
     }
 
     private fun IrAnonymousInitializer.updateFieldInitialization(
-        oldFieldSymbol: IrFieldSymbol,
         volatileFieldSymbol: IrFieldSymbol,
         initExpr: IrExpression,
         index: Int
     ) {
+        val oldIrSetField = body.statements[index] as IrSetField
         // save the order of field initialization in init block
-        body.statements.singleOrNull {
-            it is IrSetField && it.symbol == oldFieldSymbol
-        }?.let {
-            it as IrSetField
-            with(atomicfuSymbols.createBuilder(it.symbol)) {
-                body.statements[index] = irSetField(it.receiver, volatileFieldSymbol.owner, initExpr)
-            }
+        with(atomicfuSymbols.createBuilder(oldIrSetField.symbol)) {
+            body.statements[index] = irSetField(oldIrSetField.receiver, volatileFieldSymbol.owner, initExpr)
         }
     }
 
