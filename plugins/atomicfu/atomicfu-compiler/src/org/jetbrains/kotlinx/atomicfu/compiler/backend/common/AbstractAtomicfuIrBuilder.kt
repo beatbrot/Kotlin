@@ -157,15 +157,12 @@ abstract class AbstractAtomicfuIrBuilder(
         val initializer = oldAtomicField.initializer?.expression
         return if (initializer == null) {
             // replace field initialization in the init block
-            val initBlock = oldAtomicField.getInitBlockForField(parentContainer)
-            // property initialization order in the init block matters -> transformed initializer should be placed at the same position
-            val initExprWithIndex = initBlock.getInitExprWithIndexFromInitBlock(oldAtomicField.symbol)
-                ?: error("The atomic array ${oldAtomicField.render()} was not initialized neither at the declaration, nor in the init block." + CONSTRAINTS_MESSAGE)
+            val (initBlock, initExprWithIndex) = oldAtomicField.getInitBlockWithIndexedInitExpr(parentContainer)
             val atomicFactoryCall = initExprWithIndex.value.value
             val initExprIndex = initExprWithIndex.index
             newFieldBuilder(atomicFactoryCall).also { newField ->
                 val initExpr = newField.initializer?.expression
-                    ?: error("The generated field [${newField.render()}] should've already be initialized." + CONSTRAINTS_MESSAGE)
+                    ?: error("The generated field [${newField.render()}] should've already be initialized.")
                 newField.initializer = null
                 initBlock.updateFieldInitialization(oldAtomicField.symbol, newField.symbol, initExpr, initExprIndex)
             }
@@ -173,14 +170,6 @@ abstract class AbstractAtomicfuIrBuilder(
             newFieldBuilder(initializer)
         }
     }
-
-    private fun IrAnonymousInitializer.getInitExprWithIndexFromInitBlock(
-        oldFieldSymbol: IrFieldSymbol
-    ): IndexedValue<IrSetField>? =
-        body.statements.withIndex().singleOrNull { it.value is IrSetField && (it.value as IrSetField).symbol == oldFieldSymbol }?.let {
-            @Suppress("UNCHECKED_CAST")
-            it as IndexedValue<IrSetField>
-        }
 
     private fun IrAnonymousInitializer.updateFieldInitialization(
         oldFieldSymbol: IrFieldSymbol,
@@ -199,11 +188,12 @@ abstract class AbstractAtomicfuIrBuilder(
         }
     }
 
-    private fun IrField.getInitBlockForField(parentContainer: IrDeclarationContainer): IrAnonymousInitializer {
+    private fun IrField.getInitBlockWithIndexedInitExpr(parentContainer: IrDeclarationContainer): Pair<IrAnonymousInitializer, IndexedValue<IrSetField>> {
         for (declaration in parentContainer.declarations) {
             if (declaration is IrAnonymousInitializer) {
-                if (declaration.body.statements.any { it is IrSetField && it.symbol == this.symbol }) {
-                    return declaration
+                declaration.body.statements.withIndex().singleOrNull { it.value is IrSetField && (it.value as IrSetField).symbol == this.symbol }?.let {
+                    @Suppress("UNCHECKED_CAST")
+                    return declaration to it as IndexedValue<IrSetField>
                 }
             }
         }
