@@ -35,6 +35,34 @@ abstract class AbstractAtomicfuIrBuilder(
 
     abstract val atomicfuSymbols: AbstractAtomicSymbols
 
+    /**
+     * This is the only place where Bool <-> Int conversion happens for AtomicBoolean properties.
+     * On JVM:
+     * - AtomicBoolean property is replaced with a volatile Int field + AtomicIntegerFieldUpdater
+     * - AtomicBooleanArray is replaced with AtomicIntegerArray
+     * On K/N:
+     * - AtomicBoolean property is replaced with a volatile Boolean field + atomic intrinsics parameterized with Boolean -> no conversions
+     * - AtomicBooleanArray is replaced with AtomicIntArray
+     *
+     * There are 2 conversion cases:
+     * 1. The function that returns the current / updated value of the atomic should return a Boolean (get/getAndSet/updateAndGet/getAndUpdate):
+     *   val b: AtomicBoolean = atomic(false)         @Volatile b$volatile: Int = 0 // it's handled with the AtomicIntegerFieldUpdater
+     *   val res: Boolean = b.get()            -----> val res: Boolean = b$FU.get().toBoolean() // the return value should be casted to Boolean
+     * 2. Arguments passed to atomicfu functions are Boolean, these invocations are delegated to atomic handlers that update the volatile Int field,
+     *    hence Boolean arguments should be casted to Int:
+     *    b.compareAndSet(false, true) -----> b$FU.compareAndSet(0, 1) // field updaters for JVM
+     *                                        ::b$volatile.compareAndSetField(0, 1) // atomic intrinsics for K/N
+     *
+     *  Example with `loop` function:
+     *  val res: Boolean = b.loop { cur ->  -----> fun loop$atomicfu$boolean(atomicHandler: Any?, action: (Boolean) -> Boolean) // transformed loop function
+     *      if (!cur) return                       loop$atomicfu$boolean(b$FU, action: (Boolean) -> Boolean) {
+     *      b.compareAndSet(cur, false)                while(true) {
+     *  }                                                  val cur: Boolean = b$FU.get().toBoolean()
+     *                                                     val upd: Boolean = action(cur)
+     *                                                     if (b$FU.compareAndSet(cur.toInt(), upd.toInt())) return
+     *                                                 }
+     *                                             }
+     */
     abstract fun irCallFunction (
         symbol: IrSimpleFunctionSymbol,
         dispatchReceiver: IrExpression?,
