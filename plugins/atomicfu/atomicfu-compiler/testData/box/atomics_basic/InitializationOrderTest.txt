@@ -11,7 +11,7 @@ final class AAA {
     public final method getCounterValue(): long
     public final method getDelegateCounterValue(): long
     public synthetic final method getIntArr(): java.util.concurrent.atomic.AtomicIntegerArray
-    private synthetic final static method getLateInitInt$volatile$FU(): java.util.concurrent.atomic.AtomicIntegerFieldUpdater
+    public synthetic final static method getLateInitInt$volatile$FU(): java.util.concurrent.atomic.AtomicIntegerFieldUpdater
     public synthetic final method getLateInitInt$volatile(): int
     private synthetic final static method get_counter$volatile$FU(): java.util.concurrent.atomic.AtomicLongFieldUpdater
     private synthetic final method get_counter$volatile(): long

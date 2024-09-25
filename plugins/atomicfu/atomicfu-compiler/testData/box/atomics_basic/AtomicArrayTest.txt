@@ -24,8 +24,7 @@ final class AtomicArrayClass {
     private synthetic final field refArr: java.util.concurrent.atomic.AtomicReferenceArray
     static method <clinit>(): void
     public method <init>(): void
-    public synthetic final static method access$getA$volatile$FU(): java.util.concurrent.atomic.AtomicReferenceFieldUpdater
-    private synthetic final static method getA$volatile$FU(): java.util.concurrent.atomic.AtomicReferenceFieldUpdater
+    public synthetic final static method getA$volatile$FU$main(): java.util.concurrent.atomic.AtomicReferenceFieldUpdater
     public synthetic final method getA$volatile$main(): java.lang.Object
     public synthetic final method getAnyArr(): java.util.concurrent.atomic.AtomicReferenceArray
     public synthetic final method getBooleanArr(): java.util.concurrent.atomic.AtomicIntegerArray

@@ -6,8 +6,7 @@ final class LockFreeQueue$Node {
     private final field value: int
     static method <clinit>(): void
     public method <init>(p0: int): void
-    public synthetic final static method access$getNext$volatile$FU(): java.util.concurrent.atomic.AtomicReferenceFieldUpdater
-    private synthetic final static method getNext$volatile$FU(): java.util.concurrent.atomic.AtomicReferenceFieldUpdater
+    public synthetic final static method getNext$volatile$FU(): java.util.concurrent.atomic.AtomicReferenceFieldUpdater
     public synthetic final method getNext$volatile(): java.lang.Object
     public final method getValue(): int
     public synthetic final method setNext$volatile(p0: java.lang.Object): void

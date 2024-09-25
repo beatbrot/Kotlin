@@ -91,23 +91,13 @@ class AtomicfuJvmIrTransformer(
                 val atomicUpdaterField = irJavaAtomicFieldUpdater(volatilePropertyHandler.declaration.backingField!!, parentClass)
                 val atomicUpdaterProperty = buildPropertyWithAccessors(
                     atomicUpdaterField,
-                    atomicfuProperty.getMinVisibility(),
+                    atomicfuProperty.visibility,
                     isVar = false,
                     isStatic = true,
                     parentClass
                 )
                 return AtomicFieldUpdater(volatilePropertyHandler, atomicUpdaterProperty)
             }
-        }
-
-        private fun IrProperty.getMinVisibility(): DescriptorVisibility {
-            // To protect atomic properties from leaking out of the current sourceSet, they are required to be internal or private,
-            // or the containing class may be internal or private.
-            // This method returns the minimal visibility between the property visibility and the class visibility applied to atomic updaters or volatile wrappers.
-            val classVisibility = if (this.parent is IrClass) parentAsClass.visibility else DescriptorVisibilities.PUBLIC
-            val compare = visibility.compareTo(classVisibility)
-                ?: -1 // in case of non-comparable visibilities (e.g. local and private) return property visibility
-            return if (compare > 0) classVisibility else visibility
         }
     }
 
