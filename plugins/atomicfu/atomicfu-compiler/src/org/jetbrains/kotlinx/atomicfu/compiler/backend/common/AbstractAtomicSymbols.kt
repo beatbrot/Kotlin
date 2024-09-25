@@ -7,9 +7,7 @@ package org.jetbrains.kotlinx.atomicfu.compiler.backend.common
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrBuiltIns
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.declarations.impl.IrFactoryImpl
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
@@ -26,7 +24,7 @@ abstract class AbstractAtomicSymbols(
     private val moduleFragment: IrModuleFragment
 ) {
     val irBuiltIns: IrBuiltIns = context.irBuiltIns
-    protected val irFactory: IrFactory = IrFactoryImpl
+    protected val irFactory: IrFactory = context.irFactory
 
     abstract val volatileAnnotationClass: IrClass
 

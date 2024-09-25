@@ -127,7 +127,7 @@ class JvmAtomicfuIrBuilder(
             visibility = DescriptorVisibilities.PRIVATE
             origin = AbstractAtomicSymbols.ATOMICFU_GENERATED_FIELD
         }.apply {
-            initializer = irExprBody(newJavaAtomicFieldUpdater(fuClass, parentClass, atomicfuSymbols.irBuiltIns.anyNType, fieldName))
+            initializer = irExprBody(newJavaAtomicFieldUpdater(fuClass, parentClass, irBuiltIns.anyNType, fieldName))
             parent = parentClass
         }
     }

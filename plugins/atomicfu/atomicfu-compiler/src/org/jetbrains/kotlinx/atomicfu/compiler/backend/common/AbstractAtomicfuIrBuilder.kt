@@ -557,7 +557,7 @@ abstract class AbstractAtomicfuIrBuilder(
                         }, "atomicfu\$upd", false
                     )
                     +irIfThen(
-                        type = atomicfuSymbols.irBuiltIns.unitType,
+                        type = irBuiltIns.unitType,
                         condition = invokeFunctionOnAtomicHandler(
                             atomicHandlerType = atomicHandlerType,
                             getAtomicHandler = getAtomicHandler.deepCopyWithSymbols(),
