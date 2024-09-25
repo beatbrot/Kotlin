@@ -26,6 +26,8 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.disambiguateName
 import org.jetbrains.kotlin.gradle.tasks.*
 import org.jetbrains.kotlin.gradle.tasks.dependsOn
 import org.jetbrains.kotlin.gradle.tasks.registerTask
+import org.jetbrains.kotlin.gradle.utils.REGULAR_KLIB_ARTIFACT_CLASSIFIER
+import org.jetbrains.kotlin.gradle.utils.configureKlibProperties
 import org.jetbrains.kotlin.gradle.utils.libsDirectory
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
 import org.jetbrains.kotlin.gradle.utils.setAttribute
@@ -48,7 +50,7 @@ internal val KotlinNativeKlibArtifact = KotlinTargetArtifact { target, apiElemen
 
 internal fun createRegularKlibArtifact(compilation: AbstractKotlinNativeCompilation) = createKlibArtifact(
     compilation = compilation,
-    classifier = null,
+    classifier = REGULAR_KLIB_ARTIFACT_CLASSIFIER,
     klibProducingTask = compilation.compileTaskProvider
 )
 
@@ -96,10 +98,7 @@ internal fun createKlibArtifact(
     }
     with(compilation.project.configurations.getByName(apiElementsName)) {
         val klibArtifact = compilation.project.artifacts.add(name, packedArtifactFile) { artifact ->
-            artifact.name = compilation.compilationName
-            artifact.extension = "klib"
-            artifact.type = "klib"
-            artifact.classifier = classifier
+            artifact.configureKlibProperties(compilation.compilationName, classifier)
             artifact.builtBy(packTask)
         }
         compilation.project.extensions.getByType(DefaultArtifactPublicationSet::class.java).addCandidate(klibArtifact)
