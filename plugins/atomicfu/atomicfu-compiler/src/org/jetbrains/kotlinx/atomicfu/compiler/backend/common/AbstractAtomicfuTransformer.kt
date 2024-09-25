@@ -206,7 +206,7 @@ abstract class AbstractAtomicfuTransformer(
                     atomicfuPropertyToVolatile[atomicfuProperty] = atomicHandler.declaration
                     atomicfuPropertyToAtomicHandler[atomicfuProperty] = atomicHandler
                 }
-                else -> {}
+                else -> error("Trying to register the atomic handler of an unexpected type: $atomicHandler")
             }
         }
 
