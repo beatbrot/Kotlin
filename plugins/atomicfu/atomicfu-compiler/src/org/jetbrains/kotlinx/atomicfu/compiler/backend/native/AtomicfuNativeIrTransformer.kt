@@ -41,7 +41,7 @@ class AtomicfuNativeIrTransformer(
             parentContainer: IrDeclarationContainer
         ): AtomicHandler<IrProperty>? =
             when {
-                atomicfuProperty.isAtomic() -> {
+                atomicfuProperty.isNotDelegatedAtomic() -> {
                     /**
                      * Creates an [VolatilePropertyReference] updater to replace an atomicfu property on Native:
                      * on Native all atomic operations on atomicfu properties are delegated to atomic intrinsics

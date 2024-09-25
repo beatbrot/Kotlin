@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.ir.declarations.*
  * private val arr = kotlin.concurrent.AtomicIntArray(10) // this is an [AtomicArray] handler, which replaced the original atomicfu array.
  * arr.compareAndSet(0, 0, 100) // here an operation was invoked directly on the handler
  * ```
- * 2. An atomic handler was passed as an argument to the extension function:
+ * 2. An atomic handler corresponding to an argument passed to the extension function:
  * ```
  * // original function
  * fun kotlinx.atomicfu.AtomicInt.foo(arg: Int) { compareAndSet(value, 56) }

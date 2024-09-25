@@ -21,8 +21,6 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlinx.atomicfu.compiler.backend.AtomicHandlerType
 import org.jetbrains.kotlinx.atomicfu.compiler.backend.atomicfuRender
 import org.jetbrains.kotlinx.atomicfu.compiler.backend.common.AbstractAtomicfuTransformer.Companion.VOLATILE
-import org.jetbrains.kotlinx.atomicfu.compiler.backend.getArraySizeArgument
-import org.jetbrains.kotlinx.atomicfu.compiler.backend.getAtomicFactoryValueArgument
 import org.jetbrains.kotlinx.atomicfu.compiler.diagnostic.AtomicfuErrorMessages.CONSTRAINTS_MESSAGE
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -102,7 +100,7 @@ abstract class AbstractAtomicfuIrBuilder(
     ): IrCall
 
     fun irGetProperty(property: IrProperty, dispatchReceiver: IrExpression?) =
-        irCall(property.getter?.symbol ?: error("Getter is not defined for the property ${property.render()}")).apply {
+        irCall(property.getter?.symbol ?: error("Getter is not defined for the property ${property.atomicfuRender()}")).apply {
             this.dispatchReceiver = dispatchReceiver?.deepCopyWithSymbols()
         }
 
@@ -130,13 +128,20 @@ abstract class AbstractAtomicfuIrBuilder(
         parentContainer: IrDeclarationContainer
     ): IrField {
         val atomicfuField = requireNotNull(atomicfuProperty.backingField) {
-            "The backing field of the atomic property ${atomicfuProperty.render()} declared in ${parentContainer.render()} should not be null." + CONSTRAINTS_MESSAGE
+            "The backing field of the atomic property ${atomicfuProperty.atomicfuRender()} declared in ${parentContainer.render()} should not be null." + CONSTRAINTS_MESSAGE
         }
         return buildAndInitializeNewField(atomicfuField, parentContainer) { atomicFactoryCall: IrExpression ->
             val valueType = atomicfuSymbols.atomicToPrimitiveType(atomicfuField.type as IrSimpleType)
             val initValue = atomicFactoryCall.getAtomicFactoryValueArgument()
             buildVolatileFieldOfType(atomicfuProperty.name.asString(), valueType, atomicfuField.annotations, initValue, parentContainer)
         }
+    }
+
+    // atomic(value = 0) -> 0
+    internal fun IrExpression.getAtomicFactoryValueArgument(): IrExpression {
+        require(this is IrCall) { "Expected atomic factory invocation but found: ${this.render()}" }
+        return getValueArgument(0)?.deepCopyWithSymbols()
+            ?: error("Atomic factory should take at least one argument: ${this.render()}" + CONSTRAINTS_MESSAGE)
     }
 
     abstract fun buildVolatileFieldOfType(
@@ -173,6 +178,15 @@ abstract class AbstractAtomicfuIrBuilder(
                 this.parent = parentContainer
             }
         }
+    }
+
+    // AtomicIntArray(size = 10) -> 10
+    private fun IrExpression.getArraySizeArgument(): IrExpression {
+        require(this is IrFunctionAccessExpression) {
+            "Expected atomic array factory invocation, but found: ${this.render()}."
+        }
+        return getValueArgument(0)?.deepCopyWithSymbols()
+            ?: error("Atomic array factory should take at least one argument: ${this.render()}" + CONSTRAINTS_MESSAGE)
     }
 
     protected fun buildAndInitializeNewField(

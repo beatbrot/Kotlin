@@ -23,9 +23,9 @@ import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlinx.atomicfu.compiler.backend.AtomicHandlerType
+import org.jetbrains.kotlinx.atomicfu.compiler.backend.atomicfuRender
 import org.jetbrains.kotlinx.atomicfu.compiler.backend.common.AbstractAtomicfuIrBuilder
 import org.jetbrains.kotlinx.atomicfu.compiler.backend.common.AbstractAtomicSymbols
-import org.jetbrains.kotlinx.atomicfu.compiler.backend.getAtomicFactoryValueArgument
 import org.jetbrains.kotlinx.atomicfu.compiler.diagnostic.AtomicfuErrorMessages.CONSTRAINTS_MESSAGE
 
 class JvmAtomicfuIrBuilder(
@@ -89,7 +89,7 @@ class JvmAtomicfuIrBuilder(
 
     fun irBoxedAtomicField(atomicProperty: IrProperty, parentContainer: IrDeclarationContainer): IrField {
         val atomicfuField = requireNotNull(atomicProperty.backingField) {
-            "The backing field of the atomic property ${atomicProperty.render()} declared in ${parentContainer.render()} should not be null." + CONSTRAINTS_MESSAGE
+            "The backing field of the atomic property ${atomicProperty.atomicfuRender()} declared in ${parentContainer.render()} should not be null." + CONSTRAINTS_MESSAGE
         }
         return buildAndInitializeNewField(atomicfuField, parentContainer) { atomicFactoryCall: IrExpression ->
             val initValue = atomicFactoryCall.getAtomicFactoryValueArgument()

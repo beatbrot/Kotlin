@@ -45,7 +45,7 @@ class AtomicfuJvmIrTransformer(
         ): AtomicHandler<IrProperty>? {
             val isTopLevel = parentContainer is IrFile || (parentContainer is IrClass && parentContainer.kind == ClassKind.OBJECT)
             return when {
-                atomicfuProperty.isAtomic() -> {
+                atomicfuProperty.isNotDelegatedAtomic() -> {
                     if (isTopLevel) {
                         buildBoxedAtomic(atomicfuProperty, parentContainer)
                     } else {
