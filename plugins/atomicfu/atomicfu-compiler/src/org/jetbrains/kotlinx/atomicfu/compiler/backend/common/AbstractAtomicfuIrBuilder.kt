@@ -99,31 +99,6 @@ abstract class AbstractAtomicfuIrBuilder(
         }
     }
 
-    private fun irAtomicArrayField(
-        name: Name,
-        arrayClass: IrClassSymbol,
-        isStatic: Boolean,
-        annotations: List<IrConstructorCall>,
-        size: IrExpression,
-        valueType: IrType,
-        dispatchReceiver: IrExpression?,
-        parentContainer: IrDeclarationContainer
-    ): IrField =
-        context.irFactory.buildField {
-            this.name = name
-            type = arrayClass.defaultType
-            this.isFinal = true
-            this.isStatic = isStatic
-            visibility = DescriptorVisibilities.PRIVATE
-            origin = AbstractAtomicSymbols.ATOMICFU_GENERATED_FIELD
-        }.apply {
-            this.initializer = context.irFactory.createExpressionBody(
-                newAtomicArray(arrayClass, size, valueType, dispatchReceiver)
-            )
-            this.annotations = annotations
-            this.parent = parentContainer
-        }
-
     fun buildVolatileField(
         atomicfuProperty: IrProperty,
         parentContainer: IrDeclarationContainer
@@ -154,17 +129,23 @@ abstract class AbstractAtomicfuIrBuilder(
             "The backing field of the atomic array [${atomicfuProperty.atomicfuRender()}] should not be null." + CONSTRAINTS_MESSAGE
         }
         return buildAndInitializeNewField(atomicfuArrayField, parentContainer) { atomicFactoryCall: IrExpression ->
-            val arraySize = atomicFactoryCall.getArraySizeArgument()
-            irAtomicArrayField(
-                atomicfuArrayField.name,
-                atomicfuSymbols.getAtomicArrayHanlderType(atomicfuArrayField.type),
-                atomicfuArrayField.isStatic,
-                atomicfuArrayField.annotations,
-                arraySize,
-                atomicfuSymbols.atomicArrayToPrimitiveType(atomicfuArrayField.type),
-                (atomicFactoryCall as IrFunctionAccessExpression).dispatchReceiver,
-                parentContainer
-            )
+            val size = atomicFactoryCall.getArraySizeArgument()
+            val arrayClass = atomicfuSymbols.getAtomicArrayHanlderType(atomicfuArrayField.type)
+            val valueType = atomicfuSymbols.atomicArrayToPrimitiveType(atomicfuArrayField.type)
+            context.irFactory.buildField {
+                this.name = atomicfuArrayField.name
+                type = arrayClass.defaultType
+                this.isFinal = true
+                this.isStatic = atomicfuArrayField.isStatic
+                visibility = DescriptorVisibilities.PRIVATE
+                origin = AbstractAtomicSymbols.ATOMICFU_GENERATED_FIELD
+            }.apply {
+                this.initializer = context.irFactory.createExpressionBody(
+                    newAtomicArray(arrayClass, size, valueType, (atomicFactoryCall as IrFunctionAccessExpression).dispatchReceiver)
+                )
+                this.annotations = annotations
+                this.parent = parentContainer
+            }
         }
     }
 
