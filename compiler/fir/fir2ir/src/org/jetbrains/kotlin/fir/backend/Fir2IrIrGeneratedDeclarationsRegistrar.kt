@@ -335,9 +335,9 @@ class Fir2IrIrGeneratedDeclarationsRegistrar(private val components: Fir2IrCompo
     private val emptyTypeConverter = TypeConverter(null, null)
 
     private fun IrExpression.toFirExpression(): FirExpression {
-        when (this) {
+        return when (this) {
             is IrConst -> {
-                return when (this.kind) {
+                when (this.kind) {
                     IrConstKind.Boolean -> buildLiteralExpression(
                         source = null,
                         ConstantValueKind.Boolean,
@@ -411,7 +411,7 @@ class Fir2IrIrGeneratedDeclarationsRegistrar(private val components: Fir2IrCompo
                         ?.find { it.name == enumVariantName }
                 } ?: error("Could not resolve FirEnumEntry for $enumVariantName")
 
-                val expr = buildPropertyAccessExpression {
+                buildPropertyAccessExpression {
                     val receiver = buildResolvedQualifier {
                         coneTypeOrNull = enumClassType
                         packageFqName = enumClassId.packageFqName
@@ -426,9 +426,8 @@ class Fir2IrIrGeneratedDeclarationsRegistrar(private val components: Fir2IrCompo
                     explicitReceiver = receiver
                     dispatchReceiver = receiver
                 }
-                return expr
             }
-            is IrConstructorCall -> return this.toFirAnnotation()
+            is IrConstructorCall -> this.toFirAnnotation()
             is IrVararg -> {
                 val varargElements = this.elements.map { element ->
                     when (element) {
@@ -437,7 +436,7 @@ class Fir2IrIrGeneratedDeclarationsRegistrar(private val components: Fir2IrCompo
                     }
                 }
 
-                return with(emptyTypeConverter) {
+                with(emptyTypeConverter) {
                     val type = this@toFirExpression.type.toConeType()
                     val elemType = this@toFirExpression.varargElementType.toConeType()
 
