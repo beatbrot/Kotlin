@@ -22,48 +22,50 @@ class NativeAtomicSymbols(
     moduleFragment: IrModuleFragment
 ) : AbstractAtomicSymbols(context, moduleFragment) {
 
+    private val kotlinConcurrentPackageFqName = FqName("kotlin.concurrent")
+
     override val volatileAnnotationClass: IrClass
-        get() = context.referenceClass(ClassId(FqName("kotlin.concurrent"), Name.identifier("Volatile")))?.owner
+        get() = context.referenceClass(ClassId(kotlinConcurrentPackageFqName, Name.identifier("Volatile")))?.owner
             ?: error("kotlin.concurrent.Volatile class is not found")
 
     // kotlin.concurrent.AtomicIntArray
     override val atomicIntArrayClassSymbol: IrClassSymbol by lazy {
-        context.referenceClass(ClassId(FqName("kotlin.concurrent"), Name.identifier("AtomicIntArray")))
+        context.referenceClass(ClassId(kotlinConcurrentPackageFqName, Name.identifier("AtomicIntArray")))
             ?: error("kotlin.concurrent.AtomicIntArray is not found")
     }
 
     // kotlin.concurrent.AtomicLongArray
     override val atomicLongArrayClassSymbol: IrClassSymbol by lazy {
-        context.referenceClass(ClassId(FqName("kotlin.concurrent"), Name.identifier("AtomicLongArray")))
+        context.referenceClass(ClassId(kotlinConcurrentPackageFqName, Name.identifier("AtomicLongArray")))
             ?: error("kotlin.concurrent.AtomicLongArray is not found")
     }
 
     // kotlin.concurrent.AtomicArray
     override val atomicRefArrayClassSymbol: IrClassSymbol by lazy {
-        context.referenceClass(ClassId(FqName("kotlin.concurrent"), Name.identifier("AtomicArray")))
+        context.referenceClass(ClassId(kotlinConcurrentPackageFqName, Name.identifier("AtomicArray")))
             ?: error("kotlin.concurrent.AtomicArray is not found")
     }
 
     // Intrinsics for atomic update of volatile properties
 
     val nativeAtomicGetFieldIntrinsic by lazy {
-        context.referenceFunctions(CallableId(FqName("kotlin.concurrent"), Name.identifier("atomicGetField"))).single()
+        context.referenceFunctions(CallableId(kotlinConcurrentPackageFqName, Name.identifier("atomicGetField"))).single()
     }
     val nativeAtomicSetFieldIntrinsic by lazy {
-        context.referenceFunctions(CallableId(FqName("kotlin.concurrent"), Name.identifier("atomicSetField"))).single()
+        context.referenceFunctions(CallableId(kotlinConcurrentPackageFqName, Name.identifier("atomicSetField"))).single()
     }
     val nativeCompareAndSetFieldIntrinsic by lazy {
-        context.referenceFunctions(CallableId(FqName("kotlin.concurrent"), Name.identifier("compareAndSetField"))).single()
+        context.referenceFunctions(CallableId(kotlinConcurrentPackageFqName, Name.identifier("compareAndSetField"))).single()
     }
     val nativeGetAndSetFieldIntrinsic by lazy {
-        context.referenceFunctions(CallableId(FqName("kotlin.concurrent"), Name.identifier("getAndSetField"))).single()
+        context.referenceFunctions(CallableId(kotlinConcurrentPackageFqName, Name.identifier("getAndSetField"))).single()
     }
     val nativeGetAndAddIntFieldIntrinsic by lazy {
-        context.referenceFunctions(CallableId(FqName("kotlin.concurrent"), Name.identifier("getAndAddField")))
+        context.referenceFunctions(CallableId(kotlinConcurrentPackageFqName, Name.identifier("getAndAddField")))
             .single { it.owner.returnType.isInt() }
     }
     val nativeGetAndAddLongFieldIntrinsic by lazy {
-        context.referenceFunctions(CallableId(FqName("kotlin.concurrent"), Name.identifier("getAndAddField")))
+        context.referenceFunctions(CallableId(kotlinConcurrentPackageFqName, Name.identifier("getAndAddField")))
             .single { it.owner.returnType.isLong() }
     }
     val intPlusOperator by lazy {

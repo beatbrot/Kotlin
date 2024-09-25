@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.*
 import org.jetbrains.kotlin.types.Variance
-import org.jetbrains.kotlinx.atomicfu.compiler.diagnostic.AtomicfuErrorMessages.CONSTRAINTS_MESSAGE
 
 abstract class AbstractAtomicSymbols(
     val context: IrPluginContext,
@@ -122,7 +121,7 @@ abstract class AbstractAtomicSymbols(
             "AtomicLong" -> irBuiltIns.longType
             "AtomicBoolean" -> irBuiltIns.booleanType
             "AtomicRef" -> irBuiltIns.anyNType
-            else -> error("Expected kotlinx.atomicfu.(AtomicInt|AtomicLong|AtomicBoolean|AtomicRef) type, but found ${atomicPropertyType.render()}" + CONSTRAINTS_MESSAGE)
+            else -> error("Expected kotlinx.atomicfu.(AtomicInt|AtomicLong|AtomicBoolean|AtomicRef) type, but found ${atomicPropertyType.render()}")
         }
 
     fun atomicArrayToPrimitiveType(atomicPropertyType: IrType): IrType =
@@ -130,7 +129,7 @@ abstract class AbstractAtomicSymbols(
             "AtomicIntArray", "AtomicBooleanArray" -> irBuiltIns.intType
             "AtomicLongArray" -> irBuiltIns.longType
             "AtomicArray" -> irBuiltIns.anyNType
-            else -> error("Expected kotlinx.atomicfu.(AtomicIntArray|AtomicBooleanArray|AtomicLongArray|AtomicArray) type, but found ${atomicPropertyType.render()}" + CONSTRAINTS_MESSAGE)
+            else -> error("Expected kotlinx.atomicfu.(AtomicIntArray|AtomicBooleanArray|AtomicLongArray|AtomicArray) type, but found ${atomicPropertyType.render()}")
         }
 
     abstract fun createBuilder(symbol: IrSymbol, startOffset: Int = UNDEFINED_OFFSET, endOffset: Int = UNDEFINED_OFFSET): AbstractAtomicfuIrBuilder

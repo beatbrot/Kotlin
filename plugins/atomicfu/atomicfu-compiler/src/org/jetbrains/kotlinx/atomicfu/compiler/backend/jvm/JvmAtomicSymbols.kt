@@ -38,7 +38,7 @@ class JvmAtomicSymbols(
 
     private val javaLang: IrPackageFragment = createPackage("java.lang")
     private val kotlinJvm: IrPackageFragment = createPackage("kotlin.jvm")
-    private val javaUtilConcurrent: IrPackageFragment = createPackage("java.util.concurrent.atomic")
+    private val javaUtilConcurrentAtomic: IrPackageFragment = createPackage("java.util.concurrent.atomic")
     private val javaLangClass: IrClassSymbol = createClass(javaLang, "Class", ClassKind.CLASS, Modality.FINAL)
 
     override val volatileAnnotationClass: IrClass
@@ -152,7 +152,7 @@ class JvmAtomicSymbols(
         fun IrFunction.addObjForFieldUpdaterClass() {
             if (atomicHandlerType == AtomicHandlerType.ATOMIC_FIELD_UPDATER) addValueParameter("obj", irBuiltIns.anyType)
         }
-        return createClass(javaUtilConcurrent, shortClassName, ClassKind.CLASS, Modality.FINAL).apply {
+        return createClass(javaUtilConcurrentAtomic, shortClassName, ClassKind.CLASS, Modality.FINAL).apply {
             // Add constructor
             when (atomicHandlerType) {
                 AtomicHandlerType.ATOMIC_FIELD_UPDATER -> {

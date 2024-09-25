@@ -149,7 +149,11 @@ abstract class AbstractAtomicfuIrBuilder(
         }
     }
 
-    protected fun buildAndInitializeNewField(oldAtomicField: IrField, parentContainer: IrDeclarationContainer, newFieldBuilder: (IrExpression) -> IrField): IrField {
+    protected fun buildAndInitializeNewField(
+        oldAtomicField: IrField,
+        parentContainer: IrDeclarationContainer,
+        newFieldBuilder: (IrExpression) -> IrField
+    ): IrField {
         val initializer = oldAtomicField.initializer?.expression
         return if (initializer == null) {
             // replace field initialization in the init block
