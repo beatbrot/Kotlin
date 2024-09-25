@@ -53,6 +53,7 @@ import org.jetbrains.kotlin.gradle.targets.native.UsesKonanPropertiesBuildServic
 import org.jetbrains.kotlin.gradle.targets.native.internal.getNativeDistributionDependencies
 import org.jetbrains.kotlin.gradle.targets.native.internal.inferCommonizerTarget
 import org.jetbrains.kotlin.gradle.targets.native.tasks.*
+import org.jetbrains.kotlin.gradle.targets.native.toolchain.DefaultKotlinNativeProvider
 import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeProvider
 import org.jetbrains.kotlin.gradle.targets.native.toolchain.UsesKotlinNativeBundleBuildService
 import org.jetbrains.kotlin.gradle.utils.*
@@ -367,9 +368,7 @@ internal constructor(
             // For KT-66452 we need to get rid of invocation of 'Task.project'.
             // That is why we moved setting this property to task registration
             // and added convention for backwards compatibility.
-            project.provider {
-                KotlinNativeProvider(project, konanTarget, kotlinNativeBundleBuildService)
-            })
+            DefaultKotlinNativeProvider(project))
 
     @Deprecated(
         message = "This property will be removed in future releases. Don't use it in your code.",
@@ -1166,9 +1165,8 @@ abstract class CInteropProcess @Inject internal constructor(params: Params) :
             // For KT-66452 we need to get rid of invocation of 'Task.project'.
             // That is why we moved setting this property to task registration
             // and added convention for backwards compatibility.
-            project.provider {
-                KotlinNativeProvider(project, konanTarget, kotlinNativeBundleBuildService)
-            })
+            DefaultKotlinNativeProvider(project)
+        )
 
     @Deprecated(
         message = "This property will be removed in future releases. Don't use it in your code.",

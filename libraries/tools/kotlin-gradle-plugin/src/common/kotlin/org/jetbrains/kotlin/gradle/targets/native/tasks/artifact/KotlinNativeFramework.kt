@@ -14,7 +14,7 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.*
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.Companion.kotlinPropertiesProvider
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
-import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeProvider
+import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeProviderImpl
 import org.jetbrains.kotlin.gradle.tasks.dependsOn
 import org.jetbrains.kotlin.gradle.tasks.registerTask
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
@@ -124,9 +124,11 @@ internal fun KotlinNativeArtifact.registerLinkFrameworkTask(
         task.exportLibraries.setFrom(project.configurations.getByName(exportConfigurationName))
         @Suppress("DEPRECATION")
         task.kotlinOptions(kotlinOptionsFn)
-        task.kotlinNativeProvider.set(project.provider {
-            KotlinNativeProvider(project, task.konanTarget, task.kotlinNativeBundleBuildService)
-        })
+        if (task.enabled) {
+            task.kotlinNativeProvider.set(project.provider {
+                KotlinNativeProviderImpl(project, task.konanTarget, task.kotlinNativeBundleBuildService)
+            })
+        }
         task.kotlinCompilerArgumentsLogLevel
             .value(project.kotlinPropertiesProvider.kotlinCompilerArgumentsLogLevel)
             .finalizeValueOnRead()

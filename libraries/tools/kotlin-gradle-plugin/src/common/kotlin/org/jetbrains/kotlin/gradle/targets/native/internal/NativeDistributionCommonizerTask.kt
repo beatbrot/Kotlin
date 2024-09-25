@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.report.GradleBuildMetricsReporter
 import org.jetbrains.kotlin.gradle.report.UsesBuildMetricsService
 import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeProvider
+import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeProviderImpl
 import org.jetbrains.kotlin.gradle.targets.native.toolchain.UsesKotlinNativeBundleBuildService
 import org.jetbrains.kotlin.gradle.utils.*
 import org.jetbrains.kotlin.gradle.utils.chainedFinalizeValueOnRead
@@ -130,7 +131,7 @@ internal abstract class NativeDistributionCommonizerTask
             // That is why we moved setting this property to task registration
             // and added convention for backwards compatibility.
             project.provider {
-                KotlinNativeProvider(
+                KotlinNativeProviderImpl(
                     project,
                     commonizerTargets.flatMap { target -> target.konanTargets }.toSet(),
                     kotlinNativeBundleBuildService,
@@ -173,7 +174,7 @@ internal abstract class NativeDistributionCommonizerTask
         outputs.upToDateWhen {
             // upToDateWhen executes after configuration phase, but before inputs are calculated,
             // that is why we need to get k/n bundle before commonizerCache.isUpToDate here
-            kotlinNativeProvider.get().kotlinNativeBundleVersion.get()
+            (kotlinNativeProvider.get() as? KotlinNativeProviderImpl)?.kotlinNativeBundleVersion?.get()
             commonizerCache.isUpToDate(commonizerTargets)
         }
     }
