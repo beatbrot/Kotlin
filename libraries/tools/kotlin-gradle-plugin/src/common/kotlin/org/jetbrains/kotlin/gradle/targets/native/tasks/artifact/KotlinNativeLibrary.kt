@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.Companion.kotlinPro
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeOutputKind
 import org.jetbrains.kotlin.gradle.plugin.mpp.enabledOnCurrentHostForBinariesCompilation
-import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeProviderImpl
+import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeFromToolchainProvider
 import org.jetbrains.kotlin.gradle.tasks.dependsOn
 import org.jetbrains.kotlin.gradle.tasks.registerTask
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
@@ -101,7 +101,7 @@ class KotlinNativeLibraryImpl(
                 task.toolOptions(toolOptionsConfigure)
                 if (task.enabled) {
                     task.kotlinNativeProvider.set(project.provider {
-                        KotlinNativeProviderImpl(project, task.konanTarget, task.kotlinNativeBundleBuildService)
+                        KotlinNativeFromToolchainProvider(project, task.konanTarget, task.kotlinNativeBundleBuildService)
                     })
                 }
                 task.kotlinCompilerArgumentsLogLevel

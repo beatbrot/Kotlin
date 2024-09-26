@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.gradle.plugin.launchInStage
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMetadataCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.enabledOnCurrentHostForKlibCompilation
-import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeProviderImpl
+import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeFromToolchainProvider
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import org.jetbrains.kotlin.gradle.tasks.dependsOn
 import org.jetbrains.kotlin.gradle.tasks.registerTask
@@ -60,7 +60,7 @@ internal val KotlinCreateNativeCompileTasksSideEffect = KotlinCompilationSideEff
         if (task.enabled) {
             task.kotlinNativeProvider.set(
                 project.provider {
-                    KotlinNativeProviderImpl(project, task.konanTarget, task.kotlinNativeBundleBuildService)
+                    KotlinNativeFromToolchainProvider(project, task.konanTarget, task.kotlinNativeBundleBuildService)
                 }
             )
         }

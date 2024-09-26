@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.konan.target.Distribution
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.io.File
 
-internal open class KotlinNativeProvider(project: Project) {
+internal sealed class KotlinNativeProvider(project: Project) {
     @get:Internal
     val konanDataDir: Provider<String?> = project.nativeProperties.konanDataDir.map {
         @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
@@ -40,7 +40,7 @@ internal class DefaultKotlinNativeProvider(project: Project) : KotlinNativeProvi
 /**
  * This is a nested provider for all native tasks
  */
-internal class KotlinNativeProviderImpl(
+internal class KotlinNativeFromToolchainProvider(
     project: Project,
     konanTargets: Set<KonanTarget>,
     kotlinNativeBundleBuildService: Provider<KotlinNativeBundleBuildService>,

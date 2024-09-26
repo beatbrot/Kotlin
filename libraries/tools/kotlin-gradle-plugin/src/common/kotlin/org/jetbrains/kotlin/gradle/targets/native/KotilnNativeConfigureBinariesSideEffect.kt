@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.Companion.kotlinPro
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import org.jetbrains.kotlin.gradle.plugin.statistics.NativeLinkTaskMetrics
 import org.jetbrains.kotlin.gradle.targets.KotlinTargetSideEffect
-import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeProviderImpl
+import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeFromToolchainProvider
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
 import org.jetbrains.kotlin.gradle.tasks.dependsOn
 import org.jetbrains.kotlin.gradle.tasks.locateOrRegisterTask
@@ -117,7 +117,7 @@ private fun Project.createLinkTask(binary: NativeBinary) {
 
         if (task.enabled) {
             task.kotlinNativeProvider.set(project.provider {
-                KotlinNativeProviderImpl(project, task.konanTarget, task.kotlinNativeBundleBuildService)
+                KotlinNativeFromToolchainProvider(project, task.konanTarget, task.kotlinNativeBundleBuildService)
             })
         }
 

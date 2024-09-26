@@ -14,7 +14,7 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.jetbrains.kotlin.gradle.dsl.*
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.Companion.kotlinPropertiesProvider
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
-import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeProviderImpl
+import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeFromToolchainProvider
 import org.jetbrains.kotlin.gradle.tasks.dependsOn
 import org.jetbrains.kotlin.gradle.tasks.registerTask
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
@@ -126,7 +126,7 @@ internal fun KotlinNativeArtifact.registerLinkFrameworkTask(
         task.kotlinOptions(kotlinOptionsFn)
         if (task.enabled) {
             task.kotlinNativeProvider.set(project.provider {
-                KotlinNativeProviderImpl(project, task.konanTarget, task.kotlinNativeBundleBuildService)
+                KotlinNativeFromToolchainProvider(project, task.konanTarget, task.kotlinNativeBundleBuildService)
             })
         }
         task.kotlinCompilerArgumentsLogLevel
