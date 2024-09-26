@@ -30,6 +30,10 @@ enum class StringEncoding : uint8_t {
 struct StringHeader {
     ARRAY_HEADER_FIELDS
     int32_t hashCode_; // if ArrayHeader has padding, this will go into it instead of the array's data
+    /**
+     * Layout:     | Encoding | <unused> | HC computed | Ignore last byte |
+     * bit number: | 15 .. 12 |          |           1 |                0 |
+     */
     uint16_t flags_;
     alignas(KChar) char data_[];
 
