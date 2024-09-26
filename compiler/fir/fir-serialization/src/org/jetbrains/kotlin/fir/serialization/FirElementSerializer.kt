@@ -1062,10 +1062,11 @@ class FirElementSerializer private constructor(
         // KT-67474: In K1, iteration order of `type.attributes` is the following: 1) custom attrs, then 2) builtin attrs;
         //   see it in `Annotations.withExtensionFunctionAnnotation` in functionTypes.kt
         // In K2, relevant iteration order of ArrayMap is defined by order of registration, defined by initialization order of the following properties:
-        // - `ConeAttributes.WithExtensionFunctionType` in ConeAttributes.kt (which happens first) and
-        // - `ConeAttributes.custom` in CustomAnnotationTypeAttribute.kt (which happens later)
-        // So, to make the same order during serialization, as K1 does, let's just traverse `type.attributes` in reverse order.
-        for (attribute in type.attributes.reversed()) {
+        // - `ConeAttributes.WithExtensionFunctionType` in ConeAttributes.kt and
+        // - `ConeAttributes.custom` in CustomAnnotationTypeAttribute.kt
+        // To put custom attrs before builtin ones, as K1 does, the following partial sorting is used.
+        val sortedAttributes = type.attributes.sortedBy { it !is CustomAnnotationTypeAttribute }
+        for (attribute in sortedAttributes) {
             when {
                 attribute is CustomAnnotationTypeAttribute -> typeAnnotations.addAll(attribute.annotations.nonSourceAnnotations(session))
                 attribute.key in CompilerConeAttributes.classIdByCompilerAttributeKey ->
