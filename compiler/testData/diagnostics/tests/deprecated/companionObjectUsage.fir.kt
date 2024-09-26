@@ -8,14 +8,14 @@ class Another {
 
 fun first() {
     <!DEPRECATION!>Another<!>.use()
-    Another.<!DEPRECATION!>Companion<!>.USE
+    <!DEPRECATION!>Another<!>.<!DEPRECATION!>Companion<!>.USE
     <!DEPRECATION!>Another<!>.USE
 }
 
 fun useCompanion() {
     val d = <!DEPRECATION!>Another<!>
     val x = Another.<!DEPRECATION!>Companion<!>
-    Another.<!DEPRECATION!>Companion<!>.use()
+    <!DEPRECATION!>Another<!>.<!DEPRECATION!>Companion<!>.use()
     <!DEPRECATION!>Another<!>.use()
 }
 

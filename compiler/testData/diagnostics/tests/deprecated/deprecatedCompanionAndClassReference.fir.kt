@@ -8,5 +8,5 @@ class A {
 
 fun test() {
     A::class
-    A.<!DEPRECATION!>Companion<!>::class
+    <!DEPRECATION!>A<!>.<!DEPRECATION!>Companion<!>::class
 }
