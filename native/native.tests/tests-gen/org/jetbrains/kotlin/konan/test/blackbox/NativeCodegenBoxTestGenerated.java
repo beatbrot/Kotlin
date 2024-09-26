@@ -1099,30 +1099,6 @@ public class NativeCodegenBoxTestGenerated extends AbstractNativeCodegenBoxTest 
         runTest("compiler/testData/codegen/box/assert/alwaysEnable.kt");
       }
 
-      @Test
-      @TestMetadata("assertDisabledAsActualFunction.kt")
-      public void testAssertDisabledAsActualFunction() {
-        runTest("compiler/testData/codegen/box/assert/assertDisabledAsActualFunction.kt");
-      }
-
-      @Test
-      @TestMetadata("assertDisabledAsActualFunctionHmpp.kt")
-      public void testAssertDisabledAsActualFunctionHmpp() {
-        runTest("compiler/testData/codegen/box/assert/assertDisabledAsActualFunctionHmpp.kt");
-      }
-
-      @Test
-      @TestMetadata("assertEnabledAsActualFunction.kt")
-      public void testAssertEnabledAsActualFunction() {
-        runTest("compiler/testData/codegen/box/assert/assertEnabledAsActualFunction.kt");
-      }
-
-      @Test
-      @TestMetadata("assertEnabledAsActualFunctionHmpp.kt")
-      public void testAssertEnabledAsActualFunctionHmpp() {
-        runTest("compiler/testData/codegen/box/assert/assertEnabledAsActualFunctionHmpp.kt");
-      }
-
       @Nested
       @TestMetadata("compiler/testData/codegen/box/assert/jvm")
       @TestDataPath("$PROJECT_ROOT")
@@ -30081,6 +30057,30 @@ public class NativeCodegenBoxTestGenerated extends AbstractNativeCodegenBoxTest 
       @Test
       public void testAllFilesPresentInMultiplatform() {
         KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/multiplatform"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.NATIVE, true, "k2");
+      }
+
+      @Test
+      @TestMetadata("assertDisabledAsActualFunction.kt")
+      public void testAssertDisabledAsActualFunction() {
+        runTest("compiler/testData/codegen/box/multiplatform/assertDisabledAsActualFunction.kt");
+      }
+
+      @Test
+      @TestMetadata("assertDisabledAsActualFunctionHmpp.kt")
+      public void testAssertDisabledAsActualFunctionHmpp() {
+        runTest("compiler/testData/codegen/box/multiplatform/assertDisabledAsActualFunctionHmpp.kt");
+      }
+
+      @Test
+      @TestMetadata("assertEnabledAsActualFunction.kt")
+      public void testAssertEnabledAsActualFunction() {
+        runTest("compiler/testData/codegen/box/multiplatform/assertEnabledAsActualFunction.kt");
+      }
+
+      @Test
+      @TestMetadata("assertEnabledAsActualFunctionHmpp.kt")
+      public void testAssertEnabledAsActualFunctionHmpp() {
+        runTest("compiler/testData/codegen/box/multiplatform/assertEnabledAsActualFunctionHmpp.kt");
       }
 
       @Test
