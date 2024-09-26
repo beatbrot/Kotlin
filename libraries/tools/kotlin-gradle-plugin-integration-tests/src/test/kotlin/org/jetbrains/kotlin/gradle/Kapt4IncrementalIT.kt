@@ -2,6 +2,7 @@ package org.jetbrains.kotlin.gradle
 
 import org.gradle.util.GradleVersion
 import org.jetbrains.kotlin.gradle.testbase.*
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteRecursively
@@ -14,6 +15,10 @@ open class Kapt4IncrementalIT : KaptIncrementalIT() {
     override fun TestProject.customizeProject() {
         forceKapt4()
     }
+
+    @Disabled("KT-71786: K2KAPT task does not fail")
+    @GradleTest
+    override fun testKaptError(gradleVersion: GradleVersion) {}
 
     @DisplayName("Incremental kapt run is correct after removing all Kotlin sources")
     @GradleTest

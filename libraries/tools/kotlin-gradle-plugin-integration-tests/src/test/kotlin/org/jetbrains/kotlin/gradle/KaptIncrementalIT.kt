@@ -86,7 +86,6 @@ open class KaptIncrementalIT : KGPBaseTest() {
         }
     }
 
-    @Disabled("KT- ")
     @DisplayName("Successfully rebuild after compilation error")
     @GradleTest
     fun testCompileError(gradleVersion: GradleVersion) {
@@ -110,7 +109,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
 
     @DisplayName("Successfully rebuild after KAPT stubs generation error")
     @GradleTest
-    fun testKaptError(gradleVersion: GradleVersion) {
+    open fun testKaptError(gradleVersion: GradleVersion) {
         kaptProject(gradleVersion) {
             build("assemble")
 

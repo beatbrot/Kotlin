@@ -12,7 +12,6 @@ import org.junit.jupiter.api.DisplayName
 import kotlin.io.path.appendText
 import kotlin.io.path.name
 import kotlin.io.path.walk
-import kotlin.io.path.writeText
 
 @DisplayName("Kapt 4 base checks")
 class Kapt4IT : Kapt3IT() {
@@ -34,7 +33,7 @@ class Kapt4IT : Kapt3IT() {
     @GradleTest
     override fun useK2KaptProperty(gradleVersion: GradleVersion) {}
 
-    @Disabled("KT- stub generation should fail on files with declaration syntax errors but in K2KAPT it does not")
+    @Disabled("KT-71786: K2KAPT task does not fail")
     @GradleTest
     override fun testFailOnTopLevelSyntaxError(gradleVersion: GradleVersion) {}
 
@@ -67,7 +66,7 @@ class Kapt4ClassLoadersCacheIT : Kapt3ClassLoadersCacheIT() {
     @GradleTest
     override fun fallBackModeWithLanguageVersion2_0(gradleVersion: GradleVersion) {}
 
-    @Disabled("KT- stub generation should fail on files with declaration syntax errors but in K2KAPT it does not")
+    @Disabled("KT-71786: K2KAPT task does not fail")
     @GradleTest
     override fun testFailOnTopLevelSyntaxError(gradleVersion: GradleVersion) {}
 }
