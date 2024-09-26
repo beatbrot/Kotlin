@@ -21,9 +21,7 @@ import org.jetbrains.kotlinx.atomicfu.compiler.backend.common.AbstractAtomicfuIr
 class NativeAtomicfuIrBuilder(
     override val atomicfuSymbols: NativeAtomicSymbols,
     symbol: IrSymbol,
-    startOffset: Int,
-    endOffSet: Int
-): AbstractAtomicfuIrBuilder(atomicfuSymbols.irBuiltIns, symbol, startOffset, endOffSet) {
+): AbstractAtomicfuIrBuilder(atomicfuSymbols.irBuiltIns, symbol) {
 
     override fun irCallFunction(
         symbol: IrSimpleFunctionSymbol,

@@ -26,10 +26,8 @@ import java.util.concurrent.atomic.AtomicInteger
 
 abstract class AbstractAtomicfuIrBuilder(
     protected val irBuiltIns: IrBuiltIns,
-    symbol: IrSymbol,
-    startOffset: Int,
-    endOffset: Int
-) : IrBuilderWithScope(IrGeneratorContextBase(irBuiltIns), Scope(symbol), startOffset, endOffset) {
+    symbol: IrSymbol
+) : IrBuilderWithScope(IrGeneratorContextBase(irBuiltIns), Scope(symbol), UNDEFINED_OFFSET, UNDEFINED_OFFSET) {
 
     abstract val atomicfuSymbols: AbstractAtomicSymbols
 

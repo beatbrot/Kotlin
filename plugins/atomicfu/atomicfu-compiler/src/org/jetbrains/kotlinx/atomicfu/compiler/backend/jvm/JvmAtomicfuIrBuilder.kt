@@ -31,9 +31,7 @@ import org.jetbrains.kotlinx.atomicfu.compiler.diagnostic.AtomicfuErrorMessages.
 class JvmAtomicfuIrBuilder(
     override val atomicfuSymbols: JvmAtomicSymbols,
     symbol: IrSymbol,
-    startOffset: Int,
-    endRange: Int
-): AbstractAtomicfuIrBuilder(atomicfuSymbols.irBuiltIns, symbol, startOffset, endRange) {
+): AbstractAtomicfuIrBuilder(atomicfuSymbols.irBuiltIns, symbol) {
 
     override fun irCallFunction(
         symbol: IrSimpleFunctionSymbol,

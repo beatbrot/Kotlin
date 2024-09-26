@@ -81,5 +81,5 @@ class NativeAtomicSymbols(
     fun isVolatilePropertyReferenceGetter(type: IrType) = type.classOrNull == irBuiltIns.functionN(0).symbol
 
     override fun createBuilder(symbol: IrSymbol) =
-        NativeAtomicfuIrBuilder(this, symbol, UNDEFINED_OFFSET, UNDEFINED_OFFSET)
+        NativeAtomicfuIrBuilder(this, symbol)
 }

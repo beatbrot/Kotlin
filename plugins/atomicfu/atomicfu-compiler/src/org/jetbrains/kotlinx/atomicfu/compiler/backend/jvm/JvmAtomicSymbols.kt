@@ -298,5 +298,5 @@ class JvmAtomicSymbols(
     }
 
     override fun createBuilder(symbol: IrSymbol): JvmAtomicfuIrBuilder =
-        JvmAtomicfuIrBuilder(this, symbol, UNDEFINED_OFFSET, UNDEFINED_OFFSET)
+        JvmAtomicfuIrBuilder(this, symbol)
 }

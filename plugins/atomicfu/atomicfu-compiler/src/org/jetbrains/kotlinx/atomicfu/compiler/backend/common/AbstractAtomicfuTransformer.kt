@@ -581,7 +581,7 @@ abstract class AbstractAtomicfuTransformer(
                 it.name.asString() == mangleAtomicExtension(declaration.name.asString(), atomicHandlerType, valueType)
             }?.let { return it }
             /**
-             * NOTE: this comment is applicable to the JVM backend incremental compialtion:
+             * NOTE: this comment is applicable to the JVM backend incremental compilation:
              * If the transformed declaration is not found then the call may be performed from another module
              * which depends on the module where declarations are generated from untransformed metadata (real transformed declarations are not there).
              * This happens if the call is performed from the test module or in case of incremental compilation.
