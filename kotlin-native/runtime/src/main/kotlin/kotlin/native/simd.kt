@@ -13,14 +13,14 @@ import kotlinx.cinterop.ExperimentalForeignApi
 @ExperimentalForeignApi
 public typealias Vector128 = kotlinx.cinterop.Vector128
 
-@Suppress("DEPRECATION")
+@Suppress("DEPRECATION_ERROR")
 @Deprecated("Use kotlinx.cinterop.vectorOf instead.", ReplaceWith("kotlinx.cinterop.vectorOf(f0, f1, f2, f3)"))
 @DeprecatedSinceKotlin(warningSince = "1.9", errorSince = "2.1")
 @ExperimentalForeignApi
 @GCUnsafeCall("Kotlin_Interop_Vector4f_of")
 public external fun vectorOf(f0: Float, f1: Float, f2: Float, f3: Float): Vector128
 
-@Suppress("DEPRECATION")
+@Suppress("DEPRECATION_ERROR")
 @Deprecated("Use kotlinx.cinterop.vectorOf instead.", ReplaceWith("kotlinx.cinterop.vectorOf(f0, f1, f2, f3)"))
 @DeprecatedSinceKotlin(warningSince = "1.9", errorSince = "2.1")
 @ExperimentalForeignApi
