@@ -59,10 +59,10 @@ abstract class AbstractAtomicfuTransformer(
     protected val irBuiltIns = pluginContext.irBuiltIns
 
     // Maps atomicfu atomic property to the corresponding volatile property, used by the delegated properties transformer.
-    private val atomicfuPropertyToVolatile = mutableMapOf<IrProperty, IrProperty>()
+    protected val atomicfuPropertyToVolatile = mutableMapOf<IrProperty, IrProperty>()
 
     // Maps atomicfu property to the atomic handler (field updater/atomic array).
-    private val atomicfuPropertyToAtomicHandler = mutableMapOf<IrProperty, AtomicHandler<*>>()
+    protected val atomicfuPropertyToAtomicHandler = mutableMapOf<IrProperty, AtomicHandler<*>>()
 
     abstract val atomicfuExtensionsTransformer: AtomicExtensionTransformer
     abstract val atomicfuPropertyTransformer: AtomicPropertiesTransformer
@@ -224,6 +224,11 @@ abstract class AbstractAtomicfuTransformer(
                         "expected invocation of the delegate atomic property getter, but found ${getDelegate?.render()}." + CONSTRAINTS_MESSAGE
             }
             when {
+                /**
+                 * 1. A property is delegated to atomic factory:
+                 *
+                 * var a by atomic(0) ------> @Volatile var a$volatile: Int = 0
+                 */
                 getDelegate.isAtomicFactoryCall() -> {
                     val delegateVolatileField = with(atomicfuSymbols.createBuilder(atomicProperty.symbol)) {
                         buildVolatileField(atomicProperty, parentContainer).also {
@@ -238,33 +243,32 @@ abstract class AbstractAtomicfuTransformer(
                      * 2. Property delegated to another atomic property:
                      * it's accessors should get/set the value of the delegate (that is already transformed to the atomically updated volatile property).
                      *
-                     * val _a = atomic(0)       @Volatile _a$volatile = 0 (+ atomic updaters)
-                     * var a by _a         -->  @Volatile var a = 0
-                     *                           get() = _a$volatile
-                     *                           set(value: Int) { _a$volatile = value }
+                     * private val _a = atomic(0)       @Volatile var _a$volatile = 0
+                     * var a by _a                 -->  @Volatile var a = 0
+                     *                                    get() = _a$volatile
+                     *                                    set(value: Int) { _a$volatile = value }
                      */
                     val delegate = getDelegate.getCorrespondingProperty()
                     check(delegate.parent == atomicProperty.parent) {
                         "The delegated property [${atomicProperty.atomicfuRender()}] declared in [${atomicProperty.parent.render()}] should be declared in the same scope " +
                                 "as the corresponding atomic property [${delegate.render()}] declared in [${delegate.parent.render()}]" + CONSTRAINTS_MESSAGE
                     }
-                    val volatileProperty = atomicfuPropertyToVolatile[delegate]
-                    if (volatileProperty != null) {
-                        val volatileBackingField = volatileProperty.backingField
-                            ?: error("Volatile property ${volatileProperty.atomicfuRender()} corresponding to the atomic property ${delegate.render()} should have a non-null backingField")
-                        atomicProperty.getter?.delegateToVolatileAccessors(volatileBackingField)
-                        atomicProperty.setter?.delegateToVolatileAccessors(volatileBackingField)
-                    } else {
-                        val atomicHandler = atomicfuPropertyToAtomicHandler[delegate]
-                        if (atomicHandler != null && atomicHandler is BoxedAtomic) {
-                            atomicProperty.getter?.delegateToBoxedAtomicAccessors(atomicHandler.declaration)
-                            atomicProperty.setter?.delegateToBoxedAtomicAccessors(atomicHandler.declaration)
-                        }
-                    }
+                    atomicProperty.delegateToTransformedProperty(delegate)
                 }
                 else -> error("Unexpected initializer of the delegated property ${getDelegate.render()}" + CONSTRAINTS_MESSAGE)
             }
             atomicProperty.backingField = null
+        }
+
+        abstract fun IrProperty.delegateToTransformedProperty(originalDelegate: IrProperty)
+
+        protected fun IrProperty.delegateToVolatilePropertyAccessors(volatileProperty: IrProperty) {
+            // If a property is delegated to an in-class atomic property ->
+            // delegate to the accessors of the corresponding volatile property.
+            val volatileBackingField = volatileProperty.backingField
+                ?: error("Volatile property ${volatileProperty.atomicfuRender()} should have a non-null backingField")
+            getter?.delegateToVolatileAccessors(volatileBackingField)
+            setter?.delegateToVolatileAccessors(volatileBackingField)
         }
 
         private fun IrSimpleFunction.delegateToVolatileAccessors(delegateVolatileField: IrField) {
@@ -281,24 +285,6 @@ abstract class AbstractAtomicfuTransformer(
                             // b = false --> _b$volatile = 0
                             val arg = accessor.valueParameters.first().capture()
                             irSetField(dispatchReceiver, delegateVolatileField, if (accessor.valueParameters.first().type.isBoolean() && delegateVolatileField.type.isInt()) toInt(arg) else arg)
-                        }
-                    )
-                }
-            }
-        }
-
-        private fun IrSimpleFunction.delegateToBoxedAtomicAccessors(boxedAtomic: IrProperty) {
-            val accessor = this
-            with(atomicfuSymbols.createBuilder(symbol)) {
-                val dispatchReceiver = dispatchReceiverParameter?.capture()
-                val getBoxedAtomicProperty = irGetProperty(boxedAtomic, dispatchReceiver)
-                body = irBlockBody {
-                    +irReturn(
-                        if (accessor.isGetter) {
-                            invokeFunctionOnAtomicHandler(AtomicHandlerType.BOXED_ATOMIC, getBoxedAtomicProperty, "get", emptyList(), accessor.returnType)
-                        } else {
-                            val arg = accessor.valueParameters.first().capture()
-                            invokeFunctionOnAtomicHandler(AtomicHandlerType.BOXED_ATOMIC, getBoxedAtomicProperty, "set", listOf(arg), accessor.returnType)
                         }
                     )
                 }

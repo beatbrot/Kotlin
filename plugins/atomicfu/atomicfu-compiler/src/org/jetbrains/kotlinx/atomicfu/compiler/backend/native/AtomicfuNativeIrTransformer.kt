@@ -63,6 +63,12 @@ class AtomicfuNativeIrTransformer(
                 }
                 else -> null
             }
+
+        override fun IrProperty.delegateToTransformedProperty(originalDelegate: IrProperty) {
+            val volatileProperty = atomicfuPropertyToVolatile[originalDelegate]
+            requireNotNull(volatileProperty) { "The property ${originalDelegate.atomicfuRender()} is expected to be already replaced with a corresponding volatile property, but none was found." }
+            delegateToVolatilePropertyAccessors(volatileProperty)
+        }
     }
 
     private inner class NativeAtomicFunctionCallTransformer : AtomicFunctionCallTransformer() {

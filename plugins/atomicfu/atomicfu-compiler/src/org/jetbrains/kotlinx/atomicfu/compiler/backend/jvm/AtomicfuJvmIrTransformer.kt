@@ -7,15 +7,15 @@ package org.jetbrains.kotlinx.atomicfu.compiler.backend.jvm
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.descriptors.ClassKind
-import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
-import org.jetbrains.kotlin.descriptors.DescriptorVisibility
 import org.jetbrains.kotlin.ir.builders.declarations.addValueParameter
+import org.jetbrains.kotlin.ir.builders.irBlockBody
+import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.typeWith
-import org.jetbrains.kotlin.ir.util.parentAsClass
+import org.jetbrains.kotlin.ir.util.isGetter
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlinx.atomicfu.compiler.backend.*
 import org.jetbrains.kotlinx.atomicfu.compiler.backend.common.AbstractAtomicfuIrBuilder
@@ -97,6 +97,44 @@ class AtomicfuJvmIrTransformer(
                     parentClass
                 )
                 return AtomicFieldUpdater(volatilePropertyHandler, atomicUpdaterProperty)
+            }
+        }
+
+        override fun IrProperty.delegateToTransformedProperty(originalDelegate: IrProperty) {
+            val volatileProperty = atomicfuPropertyToVolatile[originalDelegate]
+            // On JVM there are 2 options:
+            // 1.  A given property is delegated to an in-class atomic ->
+            //  a corresponding volatile property (with atomic field updaters) should already be registered -> delegate to this volatile property.
+            // 2. A given property is delegated to a top-level atomic ->
+            //  a corresponding [BoxedAtomic] handler should already be registered -> delegate to its accessors.
+            if (volatileProperty != null) {
+                delegateToVolatilePropertyAccessors(volatileProperty)
+            } else {
+                val atomicHandler = atomicfuPropertyToAtomicHandler[originalDelegate]
+                require(atomicHandler != null && atomicHandler is BoxedAtomic) {
+                    "A property ${originalDelegate.atomicfuRender()} was delegated to ${originalDelegate.atomicfuRender()} atomicfu property, " +
+                            "but neither a its corresponding volatile property nor a Java boxed atomic handler was found."
+                }
+                getter?.delegateToBoxedAtomicAccessors(atomicHandler.declaration)
+                setter?.delegateToBoxedAtomicAccessors(atomicHandler.declaration)
+            }
+        }
+
+        private fun IrSimpleFunction.delegateToBoxedAtomicAccessors(boxedAtomic: IrProperty) {
+            val accessor = this
+            with(atomicfuSymbols.createBuilder(symbol)) {
+                val dispatchReceiver = dispatchReceiverParameter?.capture()
+                val getBoxedAtomicProperty = irGetProperty(boxedAtomic, dispatchReceiver)
+                body = irBlockBody {
+                    +irReturn(
+                        if (accessor.isGetter) {
+                            invokeFunctionOnAtomicHandler(AtomicHandlerType.BOXED_ATOMIC, getBoxedAtomicProperty, "get", emptyList(), accessor.returnType)
+                        } else {
+                            val arg = accessor.valueParameters.first().capture()
+                            invokeFunctionOnAtomicHandler(AtomicHandlerType.BOXED_ATOMIC, getBoxedAtomicProperty, "set", listOf(arg), accessor.returnType)
+                        }
+                    )
+                }
             }
         }
     }
