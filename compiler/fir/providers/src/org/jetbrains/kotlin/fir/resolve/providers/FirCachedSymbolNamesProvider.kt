@@ -61,8 +61,14 @@ abstract class FirCachedSymbolNamesProvider(protected val session: FirSession) :
         cachedPackageNames
     }
 
+    /**
+     * This cache is (possibly) kept on a soft reference because "names in package" caches can accumulate a lot of entries which can be
+     * recomputed. See KT-70886.
+     */
     private val topLevelClassifierNamesByPackage =
-        session.firCachesFactory.createCache(::computeTopLevelClassifierNames)
+        session.firCachesFactory.createPossiblySoftLazyValue {
+            session.firCachesFactory.createCache(::computeTopLevelClassifierNames)
+        }
 
     private val topLevelCallablePackageNames by lazy(LazyThreadSafetyMode.PUBLICATION) {
         // See the comment in `topLevelClassifierPackageNames` above for reasoning about `hasSpecific*PackageNamesComputation`.
@@ -72,8 +78,13 @@ abstract class FirCachedSymbolNamesProvider(protected val session: FirSession) :
         cachedPackageNames
     }
 
+    /**
+     * @see topLevelClassifierNamesByPackage
+     */
     private val topLevelCallableNamesByPackage =
-        session.firCachesFactory.createCache(::computeTopLevelCallableNames)
+        session.firCachesFactory.createPossiblySoftLazyValue {
+            session.firCachesFactory.createCache(::computeTopLevelCallableNames)
+        }
 
     override fun getPackageNames(): Set<String>? = cachedPackageNames
 
@@ -89,7 +100,7 @@ abstract class FirCachedSymbolNamesProvider(protected val session: FirSession) :
     // This is used by the compiler `FirCachingCompositeSymbolProvider` to bypass the cache access for classifier package names, because
     // the compiler never computes this package set.
     protected fun getTopLevelClassifierNamesInPackageSkippingPackageCheck(packageFqName: FqName): Set<Name>? =
-        topLevelClassifierNamesByPackage.getValue(packageFqName)
+        topLevelClassifierNamesByPackage.getValue().getValue(packageFqName)
 
     override fun getPackageNamesWithTopLevelCallables(): Set<String>? = topLevelCallablePackageNames
 
@@ -97,7 +108,7 @@ abstract class FirCachedSymbolNamesProvider(protected val session: FirSession) :
         val packageNames = getPackageNamesWithTopLevelCallables()
         if (packageNames != null && packageFqName.asString() !in packageNames) return emptySet()
 
-        return topLevelCallableNamesByPackage.getValue(packageFqName)
+        return topLevelCallableNamesByPackage.getValue().getValue(packageFqName)
     }
 }
 
