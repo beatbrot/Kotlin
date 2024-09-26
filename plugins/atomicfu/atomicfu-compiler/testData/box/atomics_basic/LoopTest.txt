@@ -24,12 +24,12 @@ public final class LoopTest {
     private synthetic volatile field rs$volatile: java.lang.Object
     static method <clinit>(): void
     public method <init>(): void
-    public final method atomicfuBooleanLoopTest(): boolean
+    public final method atomicfuBooleanLoopTest(p0: boolean): boolean
     public final method atomicfuGetAndUpdateTest(): void
-    public final method atomicfuIntLoopTest(): int
-    public final method atomicfuLongLoopTest(): long
+    public final method atomicfuIntLoopTest(p0: int): int
+    public final method atomicfuLongLoopTest(p0: long): long
     public final method atomicfuLoopTest(): void
-    public final @org.jetbrains.annotations.NotNull method atomicfuRefLoopTest(): LoopTest$A
+    public final @org.jetbrains.annotations.NotNull method atomicfuRefLoopTest(@org.jetbrains.annotations.NotNull p0: LoopTest$A): LoopTest$A
     public final method atomicfuUpdateAndGetTest(): void
     public final method atomicfuUpdateTest(): void
     private synthetic final static method getA$volatile$FU(): java.util.concurrent.atomic.AtomicIntegerFieldUpdater
