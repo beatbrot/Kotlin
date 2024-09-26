@@ -141,12 +141,12 @@ class AtomicfuNativeIrTransformer(
                     arrayClassSymbol.defaultType
                 }
                 valueParameters.size > 2 &&
-                        valueParameters[0].name.asString() == ATOMIC_HANDLER && valueParameters[0].type == type &&
-                        valueParameters[1].name.asString() == INDEX && valueParameters[1].type == irBuiltIns.intType
+                        valueParameters.holdsAt(0, ATOMIC_HANDLER, type) &&
+                        valueParameters.holdsAt(1, INDEX, irBuiltIns.intType)
             }
             AtomicHandlerType.NATIVE_PROPERTY_REF -> {
                 valueParameters.size > 1 &&
-                        valueParameters[0].name.asString() == ATOMIC_HANDLER && valueParameters[0].type == atomicfuSymbols.kMutableProperty0GetterType(valueType)
+                        valueParameters.holdsAt(0, ATOMIC_HANDLER, atomicfuSymbols.kMutableProperty0GetterType(valueType))
             }
             else -> error("Unexpected atomic handler type for Native backend: $atomicHandlerType")
         }
