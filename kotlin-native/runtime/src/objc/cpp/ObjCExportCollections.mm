@@ -189,8 +189,8 @@ static inline KInt objCIndexToKotlinOrThrow(NSUInteger index) {
 
 -(id)objectAtIndex:(NSUInteger)index {
   kotlin::CalledFromNativeGuard guard;
-  ObjHolder kotlinValueHolder(Kotlin_List_get(listHolder.ref(), index));
-  KRef kotlinValue = objHolder.obj();
+  ObjHolder holder(Kotlin_List_get(listHolder.ref(), index));
+  KRef kotlinValue = holder.obj();
   return refToObjCOrNSNull(kotlinValue);
 }
 
@@ -424,9 +424,9 @@ static inline id KSet_getElement(KRef set, id object) {
 
 static inline id KMap_get(KRef map, id aKey) {
   ObjHolder keyHolder(refFromObjCOrNSNull(aKey));
-  ObjHolder valueHolder(Kotlin_Map_get(map, kotlinKey));
-
   KRef kotlinKey = keyHolder.obj();
+
+  ObjHolder valueHolder(Kotlin_Map_get(map, kotlinKey));
   KRef kotlinValue = valueHolder.obj();
 
   if (kotlinValue == nullptr) {
