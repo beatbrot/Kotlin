@@ -15,14 +15,13 @@ import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeBundleAr
 
 internal val NativeToolchainProjectSetupAction = KotlinProjectSetupCoroutine {
     val kotlinTargets = project.multiplatformExtension.awaitTargets()
-    if (project.nativeProperties.isToolchainEnabled.get()) {
-        if (kotlinTargets.flatMap { target -> target.compilations }
-                .filterIsInstance<AbstractKotlinNativeCompilation>()
-                .any { it.konanTarget.enabledOnCurrentHostForKlibCompilation(project.kotlinPropertiesProvider) }
-        ) {
-            addKotlinNativeBundleConfiguration(project)
-            KotlinNativeBundleArtifactFormat.setupAttributesMatchingStrategy(project.dependencies.attributesSchema)
-            KotlinNativeBundleArtifactFormat.setupTransform(project)
-        }
+    if (!project.nativeProperties.isToolchainEnabled.get()) return@KotlinProjectSetupCoroutine
+    if (kotlinTargets.flatMap { target -> target.compilations }
+            .filterIsInstance<AbstractKotlinNativeCompilation>()
+            .any { it.konanTarget.enabledOnCurrentHostForKlibCompilation(project.kotlinPropertiesProvider) }
+    ) {
+        addKotlinNativeBundleConfiguration(project)
+        KotlinNativeBundleArtifactFormat.setupAttributesMatchingStrategy(project.dependencies.attributesSchema)
+        KotlinNativeBundleArtifactFormat.setupTransform(project)
     }
 }
