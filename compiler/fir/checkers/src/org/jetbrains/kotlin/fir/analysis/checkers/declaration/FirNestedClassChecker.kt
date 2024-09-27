@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.fir.declarations.utils.isLocal
 object FirNestedClassChecker : FirRegularClassChecker(MppCheckerKind.Common) {
     override fun check(declaration: FirRegularClass, context: CheckerContext, reporter: DiagnosticReporter) {
         // Local enums / objects / companion objects are handled with different diagnostic codes.
+        // Exception is companion of local inner class.
         val isCompanion = declaration.isCompanion
         if (!isCompanion && (declaration.classKind.isSingleton || declaration.classKind == ClassKind.ENUM_CLASS) && declaration.isLocal) return
         val containingDeclaration = context.containingDeclarations.lastOrNull() as? FirClass ?: return
