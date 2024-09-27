@@ -327,7 +327,7 @@ TYPED_TEST_P(TracingGCTest, FreeObjectWithHoldedWeak) {
         auto& object1 = AllocateObject(threadData);
         StackObjectHolder stack{threadData};
         auto& weak1 = test_support::InstallWeakReference(threadData, object1.header());
-        stack->field1 = weak1.get();
+        stack->field1 = weak1.header();
 
         ASSERT_THAT(Alive(threadData), testing::UnorderedElementsAre(object1.header(), weak1.header(), stack.header()));
         ASSERT_THAT(gc::isMarked(object1.header()), false);
