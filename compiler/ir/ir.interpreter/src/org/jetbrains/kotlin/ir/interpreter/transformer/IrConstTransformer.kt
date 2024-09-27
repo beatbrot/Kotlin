@@ -34,9 +34,6 @@ fun IrElement.transformConst(
     suppressExceptions: Boolean = false,
 ): IrElement {
     val checker = IrInterpreterCommonChecker()
-    val irConstExpressionTransformer = IrConstOnlyNecessaryTransformer(
-        interpreter, irFile, mode, checker, evaluatedConstTracker, inlineConstTracker, onWarning, onError, suppressExceptions
-    )
 
     val constEvaluationContext = IrConstEvaluationContext(
         interpreter,
@@ -47,11 +44,11 @@ fun IrElement.transformConst(
         inlineConstTracker,
         onWarning,
         onError,
-        suppressExceptions
+        suppressExceptions,
     )
 
+    val irConstExpressionTransformer = IrConstOnlyNecessaryTransformer(constEvaluationContext)
     val irConstDeclarationAnnotationTransformer = IrConstDeclarationAnnotationTransformer(constEvaluationContext)
-
     val irConstTypeAnnotationTransformer = IrConstTypeAnnotationTransformer(constEvaluationContext)
 
     return this.transform(irConstExpressionTransformer, IrConstExpressionTransformer.Data()).apply {
@@ -71,9 +68,11 @@ fun IrFile.runConstOptimizations(
 
     val checker = IrInterpreterCommonChecker()
     val irConstExpressionTransformer = IrConstAllTransformer(
-        interpreter, preprocessedFile, mode, checker, evaluatedConstTracker, inlineConstTracker,
-        { _, _, _ -> }, { _, _, _ -> },
-        suppressExceptions
+        IrConstEvaluationContext(
+            interpreter, preprocessedFile, mode, checker, evaluatedConstTracker, inlineConstTracker,
+            { _, _, _ -> }, { _, _, _ -> },
+            suppressExceptions
+        )
     )
     preprocessedFile.transform(irConstExpressionTransformer, IrConstExpressionTransformer.Data())
 }
