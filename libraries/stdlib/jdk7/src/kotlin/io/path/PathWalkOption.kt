@@ -49,7 +49,7 @@ import java.nio.file.Path
 @SinceKotlin("2.1")
 public enum class PathWalkOption {
     /**
-     * Includes directory paths in the walk.
+     * Includes directory paths in the resulting sequence of the walk.
      *
      * By default, the [Path.walk] sequence does not include directory paths.
      * Passing this option to the function includes directory paths in the resulting sequence.
