@@ -29,7 +29,7 @@ import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.Companion.kotlinPro
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.report.GradleBuildMetricsReporter
 import org.jetbrains.kotlin.gradle.report.UsesBuildMetricsService
-import org.jetbrains.kotlin.gradle.targets.native.toolchain.DefaultKotlinNativeProvider
+import org.jetbrains.kotlin.gradle.targets.native.toolchain.NoopKotlinNativeProvider
 import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeProvider
 import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeFromToolchainProvider
 import org.jetbrains.kotlin.gradle.targets.native.toolchain.UsesKotlinNativeBundleBuildService
@@ -177,7 +177,7 @@ internal abstract class NativeDistributionCommonizerTask
             // that is why we need to get k/n bundle before commonizerCache.isUpToDate here
             when (val kotlinNativeProvider = kotlinNativeProvider.get()) {
                 is KotlinNativeFromToolchainProvider -> kotlinNativeProvider.kotlinNativeBundleVersion.get()
-                is DefaultKotlinNativeProvider ->
+                is NoopKotlinNativeProvider ->
                     logger.error("Unexpected Kotlin/Native provider: $kotlinNativeProvider during commonization task. Please report an issue: https://kotl.in/issue")
             }
             commonizerCache.isUpToDate(commonizerTargets)

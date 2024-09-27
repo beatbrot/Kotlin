@@ -35,9 +35,9 @@ internal sealed class KotlinNativeProvider(project: Project) {
     internal val bundleDirectory: Provider<String> = project.nativeProperties.actualNativeHomeDirectory.map { it.absolutePath }
 }
 /**
- * This Kotlin Native provider is a stub for the cases, when Kotlin Native tasks are not supported to build.
+ * This Kotlin Native provider is a stub for the cases, when Kotlin Native tasks are not supported to be built.
  */
-internal class DefaultKotlinNativeProvider(project: Project) : KotlinNativeProvider(project)
+internal class NoopKotlinNativeProvider(project: Project) : KotlinNativeProvider(project)
 
 /**
  * This Kotlin Native provider is used to get a kotlin native bundle from provided K/N toolchain.
