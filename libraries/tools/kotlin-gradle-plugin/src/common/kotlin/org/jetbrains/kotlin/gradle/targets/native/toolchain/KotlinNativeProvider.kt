@@ -14,6 +14,7 @@ import org.gradle.api.tasks.Internal
 import org.jetbrains.kotlin.gradle.internal.properties.nativeProperties
 import org.jetbrains.kotlin.gradle.plugin.KOTLIN_NATIVE_BUNDLE_CONFIGURATION_NAME
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.Companion.kotlinPropertiesProvider
+import org.jetbrains.kotlin.gradle.plugin.mpp.enabledOnCurrentHostForBinariesCompilation
 import org.jetbrains.kotlin.gradle.utils.NativeCompilerDownloader
 import org.jetbrains.kotlin.gradle.utils.property
 import org.jetbrains.kotlin.konan.target.Distribution
@@ -117,6 +118,14 @@ internal class KotlinNativeFromToolchainProvider(
                 }
             }
         )
+}
+
+internal fun UsesKotlinNativeBundleBuildService.chooseKotlinNativeProvider(project: Project, konanTarget: KonanTarget): KotlinNativeProvider {
+    if (konanTarget.enabledOnCurrentHostForBinariesCompilation()) {
+        return KotlinNativeFromToolchainProvider(project, konanTarget, kotlinNativeBundleBuildService)
+    } else {
+        return NoopKotlinNativeProvider(project)
+    }
 }
 
 internal val KotlinNativeProvider.konanDistribution
