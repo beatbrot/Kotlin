@@ -34,11 +34,13 @@ internal sealed class KotlinNativeProvider(project: Project) {
     //Using DirectoryProperty causes the native directory to be included in the configuration cache input.
     internal val bundleDirectory: Provider<String> = project.nativeProperties.actualNativeHomeDirectory.map { it.absolutePath }
 }
-
+/**
+ * This Kotlin Native provider is a stub for the cases, when Kotlin Native tasks are not supported to build.
+ */
 internal class DefaultKotlinNativeProvider(project: Project) : KotlinNativeProvider(project)
 
 /**
- * This is a nested provider for all native tasks
+ * This Kotlin Native provider is used to get a kotlin native bundle from provided K/N toolchain.
  */
 internal class KotlinNativeFromToolchainProvider(
     project: Project,
