@@ -56,7 +56,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
                 assertTasksExecuted(":kaptGenerateStubsKotlin", ":compileKotlin")
                 assertTasksUpToDate(":kaptKotlin")
                 assertTasksUpToDate(":compileJava")
-                assertCompiledKotlinSourcesHandleKapt3(listOf(projectPath.relativize(editedFile)))
+                assertCompiledKotlinSourcesHandleKapt(listOf(projectPath.relativize(editedFile)))
             }
         }
     }
@@ -101,8 +101,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
             errorKt.deleteIfExists()
             bKt.modify { "$it\n" }
             build("assemble", buildOptions = buildOptions.copy(logLevel = LogLevel.DEBUG)) {
-                assertCompiledKotlinSources(listOf(projectPath.relativize(bKt)), output)
-                assertTasksExecuted(":kaptGenerateStubsKotlin", ":compileKotlin")
+                assertCompiledKotlinSourcesHandleKapt(listOf(projectPath.relativize(bKt)))
             }
         }
     }
@@ -122,8 +121,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
             errorKt.deleteIfExists()
             bKt.modify { "$it\n" }
             build("assemble", buildOptions = buildOptions.copy(logLevel = LogLevel.DEBUG)) {
-                assertCompiledKotlinSources(listOf(projectPath.relativize(bKt)), output)
-                assertTasksExecuted(":kaptGenerateStubsKotlin", ":compileKotlin")
+                assertCompiledKotlinSourcesHandleKapt(listOf(projectPath.relativize(bKt)))
             }
         }
     }
@@ -171,7 +169,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
 
             build("assemble", buildOptions = buildOptions.copy(logLevel = LogLevel.DEBUG)) {
                 assertKapt3FullyExecuted()
-                assertCompiledKotlinSourcesHandleKapt3(listOf(projectPath.relativize(utilKt)))
+                assertCompiledKotlinSourcesHandleKapt(listOf(projectPath.relativize(utilKt)))
             }
         }
     }
@@ -192,7 +190,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
 
             build("assemble", buildOptions = buildOptions.copy(logLevel = LogLevel.DEBUG)) {
                 assertKapt3FullyExecuted()
-                assertCompiledKotlinSourcesHandleKapt3(relativeToProject(listOf(bKt, useB)))
+                assertCompiledKotlinSourcesHandleKapt(relativeToProject(listOf(bKt, useB)))
             }
         }
     }
@@ -216,7 +214,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
             build("assemble", buildOptions = buildOptions.copy(logLevel = LogLevel.DEBUG)) {
                 assertKapt3FullyExecuted()
 
-                assertCompiledKotlinSourcesHandleKapt3(listOf(projectPath.relativize(utilKt)))
+                assertCompiledKotlinSourcesHandleKapt(listOf(projectPath.relativize(utilKt)))
                 checkGenerated(kaptGeneratedToPath, *(annotatedElements + arrayOf("newUtilFun")))
             }
         }
@@ -277,7 +275,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
 
             build("assemble", buildOptions = buildOptions.copy(logLevel = LogLevel.DEBUG)) {
                 assertKapt3FullyExecuted()
-                assertCompiledKotlinSourcesHandleKapt3(javaSourcesDir("main")
+                assertCompiledKotlinSourcesHandleKapt(javaSourcesDir("main")
                         .allKotlinSources.map { projectPath.relativize(it) })
                 val affectedElements = arrayOf("B", "funB", "valB", "useB")
                 checkGenerated(kaptGeneratedToPath, *(annotatedElements.toSet() - affectedElements).toTypedArray())
@@ -379,7 +377,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
 
             build("assemble", buildOptions = buildOptions.copy(logLevel = LogLevel.DEBUG)) {
                 assertKapt3FullyExecuted()
-                assertCompiledKotlinSourcesHandleKapt3(listOf(bKt, useBKt).map { projectPath.relativize(it) })
+                assertCompiledKotlinSourcesHandleKapt(listOf(bKt, useBKt).map { projectPath.relativize(it) })
                 checkGenerated(kaptGeneratedToPath, *annotatedElements)
             }
         }
@@ -402,7 +400,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
 
             build("assemble", buildOptions = buildOptions.copy(logLevel = LogLevel.DEBUG)) {
                 assertTasksExecuted(":kaptGenerateStubsKotlin", ":compileKotlin")
-                assertCompiledKotlinSourcesHandleKapt3(relativeToProject(listOf(usageFile, delegateFile)))
+                assertCompiledKotlinSourcesHandleKapt(relativeToProject(listOf(usageFile, delegateFile)))
             }
         }
     }
@@ -418,7 +416,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
 
             build("build", buildOptions = buildOptions.copy(logLevel = LogLevel.DEBUG)) {
                 assertTasksExecuted(":kaptGenerateStubsTestKotlin", ":compileTestKotlin")
-                assertCompiledKotlinTestSourcesAreHandledByKapt3(relativeToProject(listOf(testFile)))
+                assertCompiledKotlinTestSourcesAreHandledByKapt(relativeToProject(listOf(testFile)))
             }
         }
     }
@@ -435,7 +433,7 @@ open class KaptIncrementalIT : KGPBaseTest() {
 
             build("build", buildOptions = buildOptions.copy(logLevel = LogLevel.DEBUG)) {
                 assertTasksExecuted(":kaptGenerateStubsTestKotlin", ":compileTestKotlin")
-                assertCompiledKotlinTestSourcesAreHandledByKapt3(relativeToProject(listOf(testFileToRecompile)))
+                assertCompiledKotlinTestSourcesAreHandledByKapt(relativeToProject(listOf(testFileToRecompile)))
             }
         }
     }
