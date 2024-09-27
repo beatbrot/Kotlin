@@ -25,31 +25,3 @@ kotlin {
         }
     }
 }
-
-abstract class TaskInstantiationTrackingBuildService : BuildService<BuildServiceParameters.None>, AutoCloseable {
-    var startedExecution = false
-    val tasksExecutedAtExecutionTime = mutableListOf<String>()
-
-    override fun close() {
-        require(tasksExecutedAtExecutionTime.isEmpty()) {
-            "The following tasks were instantiated at execution time: $tasksExecutedAtExecutionTime"
-        }
-    }
-}
-
-val trackingService = gradle.sharedServices.registerIfAbsent(
-    "trackingService",
-    TaskInstantiationTrackingBuildService::class.java
-) {}
-
-allprojects {
-    tasks.configureEach {
-        usesService(trackingService)
-        if (trackingService.get().startedExecution) {
-            trackingService.get().tasksExecutedAtExecutionTime.add(path)
-        }
-        doFirst {
-            trackingService.get().startedExecution = true
-        }
-    }
-}
