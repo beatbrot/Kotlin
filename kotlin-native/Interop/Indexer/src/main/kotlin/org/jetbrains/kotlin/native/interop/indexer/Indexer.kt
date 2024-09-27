@@ -150,7 +150,7 @@ public open class NativeIndexImpl(val library: NativeLibrary, val verbose: Boole
             https://github.com/Kotlin/llvm-project/blob/e3ca3c13204b52534ee555031b099657f253b1bb/clang/lib/Index/IndexingContext.cpp#L422
             But Objective-C forward declarations are treated as references:
             https://github.com/Kotlin/llvm-project/blob/75e16fd2c656fb7d27e6edc46dc1a63ff8323999/clang/lib/Index/IndexDecl.cpp#L432
-            The behavior can be changed using C++ API, but th is not available through libclang C API:
+            The behavior can be changed using C++ API, but this is not available through libclang C API:
             https://github.com/Kotlin/llvm-project/blob/d8d780bff4b23834a9ee8981f6a1193d181891aa/clang/include/clang/Index/IndexingOptions.h#L28
             https://github.com/Kotlin/llvm-project/blob/1b5110b59f85e7c9824bcc299b002ec933758932/clang/tools/libclang/Indexing.cpp#L424
 
