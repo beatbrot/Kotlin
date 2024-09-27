@@ -26,10 +26,9 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.disambiguateName
 import org.jetbrains.kotlin.gradle.tasks.*
 import org.jetbrains.kotlin.gradle.tasks.dependsOn
 import org.jetbrains.kotlin.gradle.tasks.registerTask
-import org.jetbrains.kotlin.gradle.utils.REGULAR_KLIB_ARTIFACT_CLASSIFIER
-import org.jetbrains.kotlin.gradle.utils.configureKlibProperties
 import org.jetbrains.kotlin.gradle.utils.libsDirectory
 import org.jetbrains.kotlin.gradle.utils.lowerCamelCaseName
+import org.jetbrains.kotlin.gradle.utils.registerKlibArtifact
 import org.jetbrains.kotlin.gradle.utils.setAttribute
 
 internal val KotlinNativeKlibArtifact = KotlinTargetArtifact { target, apiElements, _ ->
@@ -50,7 +49,7 @@ internal val KotlinNativeKlibArtifact = KotlinTargetArtifact { target, apiElemen
 
 internal fun createRegularKlibArtifact(compilation: AbstractKotlinNativeCompilation) = createKlibArtifact(
     compilation = compilation,
-    classifier = REGULAR_KLIB_ARTIFACT_CLASSIFIER,
+    classifier = null,
     klibProducingTask = compilation.compileTaskProvider
 )
 
@@ -89,21 +88,16 @@ internal fun createKlibArtifact(
     klibProducingTask: TaskProvider<out ProducesKlib>,
 ) {
     val apiElementsName = compilation.target.apiElementsConfigurationName
-    val (packTask, packedArtifactFile) = if (compilation.target.project.kotlinPropertiesProvider.useNonPackedKlibs) {
+    val packedArtifactFile = if (compilation.target.project.kotlinPropertiesProvider.useNonPackedKlibs) {
         // the default artifact should be compressed
         val packTask = compilation.maybeCreateKlibPackingTask(classifier, klibProducingTask)
-        packTask to packTask.map { it.archiveFile.get().asFile }
+        packTask.map { it.archiveFile.get().asFile }
     } else {
-        klibProducingTask to klibProducingTask.flatMap { it.klibFile }
+        klibProducingTask.flatMap { it.klibFile }
     }
     with(compilation.project.configurations.getByName(apiElementsName)) {
-        val klibArtifact = compilation.project.artifacts.add(name, packedArtifactFile) { artifact ->
-            artifact.configureKlibProperties(compilation.compilationName, classifier)
-            artifact.builtBy(packTask)
-        }
-        compilation.project.extensions.getByType(DefaultArtifactPublicationSet::class.java).addCandidate(klibArtifact)
-        artifacts.add(klibArtifact)
-        attributes.setAttribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, NativeArtifactFormat.KLIB)
+        outgoing.registerKlibArtifact(packedArtifactFile, compilation.compilationName, classifier)
+        attributes.setAttribute(ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, NativeArtifactFormat.KLIB) // should we do it here?
     }
 }
 

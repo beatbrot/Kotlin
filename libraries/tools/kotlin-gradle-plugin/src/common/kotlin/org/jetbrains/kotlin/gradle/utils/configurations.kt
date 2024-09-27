@@ -140,38 +140,3 @@ internal fun Configuration.addSecondaryOutgoingJvmClassesVariant(
 }
 
 internal val Configuration.lenientArtifactsView get() = incoming.artifactView { view -> view.isLenient = true }.artifacts
-
-/**
- * The `null` value is intentional
- */
-internal val REGULAR_KLIB_ARTIFACT_CLASSIFIER: String? = null
-
-/**
- * Configuration of all those properties is mandatory.
- * Otherwise, Gradle versions before 8.4 may instantiate tasks registered as artifacts during dependencies overviewing without actual resolution.
- * An example of such overviewing is [[org.jetbrains.kotlin.gradle.plugin.mpp.GranularMetadataTransformation]]
- * which does not require platform klibs, but klib generation tasks were instantiated at execution time (KT-71328) leading to races.
- * TODO: expand its usage to all places where we configure publish artifacts and investigate the effect. That might be related to KT-71764
- */
-internal fun ConfigurablePublishArtifact.configureMandatoryProperties(
-    name: String,
-    type: String,
-    extension: String,
-    classifier: String?,
-) {
-    setName(name)
-    setType(type)
-    setExtension(extension)
-    setClassifier(classifier)
-}
-
-/**
- * Configuration of all those properties is mandatory.
- * Otherwise, Gradle versions before 8.4 may instantiate tasks registered as artifacts during dependencies overviewing without actual resolution.
- * An example of such overviewing is [[org.jetbrains.kotlin.gradle.plugin.mpp.GranularMetadataTransformation]]
- * which does not require platform klibs, but klib generation tasks were instantiated at execution time (KT-71328) leading to races.
- */
-internal fun ConfigurablePublishArtifact.configureKlibProperties(
-    name: String,
-    classifier: String?,
-) = configureMandatoryProperties(name, "klib", "klib", classifier)
