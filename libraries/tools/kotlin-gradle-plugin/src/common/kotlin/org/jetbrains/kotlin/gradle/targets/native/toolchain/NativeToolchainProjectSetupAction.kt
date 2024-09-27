@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.gradle.targets.native.toolchain
 
 import org.jetbrains.kotlin.gradle.dsl.multiplatformExtension
+import org.jetbrains.kotlin.gradle.internal.properties.nativeProperties
 import org.jetbrains.kotlin.gradle.plugin.KotlinProjectSetupCoroutine
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.Companion.kotlinPropertiesProvider
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractKotlinNativeCompilation
@@ -14,12 +15,14 @@ import org.jetbrains.kotlin.gradle.targets.native.toolchain.KotlinNativeBundleAr
 
 internal val NativeToolchainProjectSetupAction = KotlinProjectSetupCoroutine {
     val kotlinTargets = project.multiplatformExtension.awaitTargets()
-    if (kotlinTargets.flatMap { target -> target.compilations }
-            .filterIsInstance<AbstractKotlinNativeCompilation>()
-            .any { it.konanTarget.enabledOnCurrentHostForKlibCompilation(project.kotlinPropertiesProvider) }
-    ) {
-        addKotlinNativeBundleConfiguration(project)
-        KotlinNativeBundleArtifactFormat.setupAttributesMatchingStrategy(project.dependencies.attributesSchema)
-        KotlinNativeBundleArtifactFormat.setupTransform(project)
+    if (project.nativeProperties.isToolchainEnabled.get()) {
+        if (kotlinTargets.flatMap { target -> target.compilations }
+                .filterIsInstance<AbstractKotlinNativeCompilation>()
+                .any { it.konanTarget.enabledOnCurrentHostForKlibCompilation(project.kotlinPropertiesProvider) }
+        ) {
+            addKotlinNativeBundleConfiguration(project)
+            KotlinNativeBundleArtifactFormat.setupAttributesMatchingStrategy(project.dependencies.attributesSchema)
+            KotlinNativeBundleArtifactFormat.setupTransform(project)
+        }
     }
 }

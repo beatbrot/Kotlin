@@ -9,7 +9,6 @@ import org.gradle.api.Project
 import org.jetbrains.kotlin.gradle.artifacts.*
 import org.jetbrains.kotlin.gradle.dsl.*
 import org.jetbrains.kotlin.gradle.internal.CustomizeKotlinDependenciesSetupAction
-import org.jetbrains.kotlin.gradle.internal.properties.nativeProperties
 import org.jetbrains.kotlin.gradle.plugin.PropertiesProvider.Companion.kotlinPropertiesProvider
 import org.jetbrains.kotlin.gradle.plugin.diagnostics.KotlinGradleProjectChecker
 import org.jetbrains.kotlin.gradle.plugin.diagnostics.KotlinToolingDiagnosticsSetupAction
@@ -103,9 +102,7 @@ internal fun Project.registerKotlinPluginExtensions() {
                 register(project, GlobalProjectStructureMetadataStorageSetupAction)
             }
 
-            if (project.nativeProperties.isToolchainEnabled.get()) {
-                register(project, NativeToolchainProjectSetupAction)
-            }
+            register(project, NativeToolchainProjectSetupAction)
         }
 
     }
